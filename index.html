@@ -14,43 +14,30 @@
     .contact-list li { padding: 10px; border-bottom: 1px solid #ddd; }
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; }
-    .form-group input { width: 100%; padding: 5px; }
+    .form-group input, .form-group textarea { width: 100%; padding: 5px; }
+    .close:hover { cursor: pointer; }
   </style>
 </head>
 <body>
   <div id="network-app">
     <div class="modal" id="modal">
       <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
+        <span class="close" onclick="closeModal()">×</span>
         <div id="category-buttons">
           <button class="button active" onclick="setCategory('clients')">Clients</button>
           <button class="button" onclick="setCategory('real estate')">Real Estate</button>
           <button class="button" onclick="setCategory('tradies')">Tradies</button>
         </div>
         <div id="subcategory-buttons" style="display: none;">
-          <button class="button" onclick="setSubcategory('leads')">Leads</button>
+          <button class="button active" onclick="setSubcategory('leads')">Leads</button>
           <button class="button" onclick="setSubcategory('customers')">Customers</button>
         </div>
         <div id="contact-list"></div>
         <div id="contact-form" style="display: none;">
           <h3 id="form-title"></h3>
           <form id="contact-form-element">
-            <div class="form-group">
-              <label>First Name:</label>
-              <input type="text" id="firstName" required>
-            </div>
-            <div class="form-group">
-              <label>Last Name:</label>
-              <input type="text" id="lastName" required>
-            </div>
-            <div class="form-group">
-              <label>Email:</label>
-              <input type="email" id="email">
-            </div>
-            <div class="form-group">
-              <label>Phone:</label>
-              <input type="tel" id="phone">
-            </div>
+            <div id="standard-fields"></div>
+            <div id="custom-fields"></div>
             <button type="submit" class="button">Save</button>
             <button type="button" class="button" onclick="closeForm()">Cancel</button>
           </form>
@@ -62,15 +49,111 @@
   </div>
 
   <script>
-    // const apiKey = new URLSearchParams(window.location.search).get('apiKey');
-    const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbl9pZCI6IllnUUp0OHppcGhlQVNtTXo2SEpmIiwidmVyc2lvbiI6MSwiaWF0IjoxNzQ4ODA3OTc5ODk1LCJzdWIiOiJ6OVNaSGxKT29KVHI4MjA5OGNLOCJ9._deFuXYQdzXwzy8T_9kzzA_CxIX_pPnaJKcgwaetKHg"
-    // const locationId = new URLSearchParams(window.location.search).get('locationId');
-    const locationId = "YgQJt8zipheASmMz6HJf"
+    const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbl9pZCI6IllnUUp0OHppcGhlQVNtTXo2SEpmIiwidmVyc2lvbiI6MSwiaWF0IjoxNzQ4ODA3OTc5ODk1LCJzdWIiOiJ6OVNaSGxKT29KVHI4MjA5OGNLOCJ9._deFuXYQdzXwzy8T_9kzzA_CxIX_pPnaJKcgwaetKHg";
+    const locationId = "YgQJt8zipheASmMz6HJf";
     let activeCategory = 'clients';
     let activeSubcategory = 'leads';
     let selectedContactId = null;
 
-    function openModal() { document.getElementById('modal').style.display = 'block'; loadContacts(); }
+    // Custom fields for Customers
+    const customerCustomFields = [
+      { label: 'Full Name', key: 'ciaf_fullname' },
+      { label: 'Address', key: 'ciaf_address' },
+      { label: 'Alternate Number', key: 'alternate_number' },
+      { label: 'Citizenship Status', key: 'citizenship_status' },
+      { label: 'REIQ Checklist', key: 'reiq_checklist' },
+      { label: 'Notes', key: 'notes', type: 'textarea' },
+      { label: 'Upload DL/Passport', key: 'upload_dlpassport' },
+      { label: 'Alternate Email', key: 'alternate_email' },
+      { label: 'Preferred Method of Communication', key: 'preferred_method_of_communication' },
+      { label: 'Type of Service', key: 'type_of_service' },
+      { label: 'Form 6 Sent?', key: 'form_sent' },
+      { label: 'Form 6 Executed', key: 'signed_by_all_parties' },
+      { label: 'Form 6 Sent to All Parties', key: 'sent_to_clients' },
+      { label: 'Client Agreement Sent?', key: 'agreement_sent' },
+      { label: 'Client Agreement Executed', key: 'agreement_signed_by_all_parties' },
+      { label: 'Client Agreement Sent to All Parties', key: 'agreement_sent_to_clients' },
+      { label: 'Service Fee', key: 'service_fee' },
+      { label: 'Fee to be Paid', key: 'fee_to_be_paid' },
+      { label: 'Retainer Including GST', key: 'retainer_including_gst' },
+      { label: 'Retainer Invoice Paid', key: 'retainer_invoice_paid' },
+      { label: 'Referral Name', key: 'referral_name' },
+      { label: 'Referral Company', key: 'referral_company' },
+      { label: 'Referral Phone', key: 'referral_phone' },
+      { label: 'Referral Email', key: 'referral_email' },
+      { label: 'Referral Fee Paid?', key: 'referral_fee_paid' },
+      { label: 'Mortgage Company', key: 'mortgage_company' },
+      { label: 'Name of the Broker', key: 'name_of_the_broker' },
+      { label: 'Address (Mortgage Broker)', key: 'address_mortgage_broker' },
+      { label: 'Phone (Mortgage Broker)', key: 'phone_mortgage_broker' },
+      { label: 'Email (Mortgage Broker)', key: 'email_mortgage_broker' },
+      { label: 'Finance Approval', key: 'finance_approval' },
+      { label: 'Date of Expiry', key: 'date_of_expiry' },
+      { label: 'Name of the Conveyancer', key: 'name_of_the_conveyancer' },
+      { label: 'Company (Conveyancer)', key: 'company_conveyancer' },
+      { label: 'Address (Conveyancer)', key: 'address_conveyancer' },
+      { label: 'Phone (Conveyancer)', key: 'phone_conveyancer' },
+      { label: 'Email (Conveyancer)', key: 'email_conveyancer' },
+      { label: 'Name of the Accountant', key: 'name_of_the_accountant' },
+      { label: 'Company (Accountant)', key: 'company_accountant' },
+      { label: 'Address (Accountant)', key: 'address_accountant' },
+      { label: 'Phone (Accountant)', key: 'phone_accountant' },
+      { label: 'Email (Accountant)', key: 'email_accountant' },
+      { label: 'Name of the Financial Adviser', key: 'name_of_the_financial_adviser' },
+      { label: 'Company (Financial Adviser)', key: 'company_financial_adviser' },
+      { label: 'Address (Financial Adviser)', key: 'address_financial_adviser' },
+      { label: 'Phone (Financial Adviser)', key: 'phone_financial_adviser' },
+      { label: 'Email (Financial Adviser)', key: 'email_financial_adviser' },
+      { label: 'Reason for Purchase', key: 'reason_for_purchase' },
+      { label: 'Strategy Outcomes', key: 'strategy_outcomes' },
+      { label: 'Tenant', key: 'tenant' },
+      { label: 'Areas/Locations', key: 'areaslocations' },
+      { label: 'Building Type', key: 'building_type' },
+      { label: 'Land Size', key: 'land_size' },
+      { label: 'Budget', key: 'budget' },
+      { label: 'Time Frame', key: 'time_frame' },
+      { label: 'Must Haves', key: 'must_haves' },
+      { label: 'Second Choice Must Haves', key: 'second_choice_must_haves' },
+      { label: 'Previously Viewed Properties', key: 'previously_viewed_properties' },
+      { label: 'Potential Properties', key: 'potential_properties' },
+      { label: 'Property Identified', key: 'property_identified' },
+      { label: 'CMA Sent?', key: 'cma_sent' },
+      { label: 'Flood', key: 'flood' },
+      { label: 'Bushfire', key: 'bushfire' },
+      { label: 'Heritage', key: 'heritage' },
+      { label: 'Title Search', key: 'title_search' },
+      { label: 'Mortgage Broker Check Complete', key: 'mortgage_broker_check_complete' },
+      { label: 'Contract Sent to Solicitor', key: 'contract_sent_to_solicitor' },
+      { label: 'Offer Received by Real Estate Agent', key: 'offer_received_by_real_estate_agent' },
+      { label: 'Full Name (Client 2)', key: 'client_2_fullname' },
+      { label: 'Address (Client 2)', key: 'client_2_address' },
+      { label: 'Full Name (Client 3)', key: 'client_3_fullname' },
+      { label: 'Phone (Client 2)', key: 'client_2_phone' },
+      { label: 'Phone (Client 3)', key: 'client_3_phone' },
+      { label: 'Alternate Number (Client 2)', key: 'client_2_alt_number' },
+      { label: 'Alternate Number (Client 3)', key: 'client_3_alt_number' },
+      { label: 'Email (Client 2)', key: 'client2_email' },
+      { label: 'Alternate Email (Client 2)', key: 'client_2alt_email' },
+      { label: 'Alternate Email (Client 3)', key: 'client_3_alt_email' },
+      { label: 'Notes (Client 2)', key: 'client_2_notes', type: 'textarea' },
+      { label: 'Notes (Client 3)', key: 'client_3_notes', type: 'textarea' },
+      { label: 'Upload DL/Passport (Client 2)', key: 'client2_upload_doc' },
+      { label: 'Upload DL/Passport (Client 3)', key: 'client_3_upload_doc' },
+      { label: 'Citizenship Status (Client 2)', key: 'client_2_citizenship' },
+      { label: 'Citizenship Status (Client 3)', key: 'client_3_citizenship' },
+      { label: 'REIQ Checklist (Client 2)', key: 'reiq_client_2' },
+      { label: 'REIQ Checklist (Client 3)', key: 'reiq_client_3' },
+      { label: 'Address (Client 3)', key: 'client_3_address' },
+      { label: 'Email (Client 3)', key: 'client_3_email' },
+    ];
+
+    function openModal() {
+      document.getElementById('modal').style.display = 'block';
+      setCategory('clients'); // Ensure Clients is active on open
+      setSubcategory('leads'); // Ensure Leads is active on open
+      loadContacts();
+    }
+
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
     function closeForm() { document.getElementById('contact-form').style.display = 'none'; }
 
@@ -94,26 +177,53 @@
 
     async function loadContacts() {
       if (activeCategory !== 'clients' || !activeSubcategory) return;
-      const url = `https://rest.gohighlevel.com/v1/contacts?locationId=${locationId}&tags=${encodeURIComponent(activeSubcategory === 'leads' ? 'new lead' : 'customer')}`;
+      const tag = activeSubcategory === 'leads' ? 'new lead' : 'customer';
+      const url = `https://rest.gohighlevel.com/v1/contacts?locationId=${locationId}&tags=${encodeURIComponent(tag)}`;
       try {
         const response = await fetch(url, {
           headers: { Authorization: `Bearer ${apiKey}` },
         });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
-        const contacts = data.contacts || data.contact || [];
+        console.log('API Response:', JSON.stringify(data, null, 2));
+
+        const contacts = data.contacts || (data.contact ? [data.contact] : []);
+        if (!Array.isArray(contacts)) throw new Error('Contacts is not an array');
+
+        // Filter contacts by exact tag match
+        const filteredContacts = contacts.filter(contact => {
+          const tags = contact.tags || [];
+          return tags.includes(tag);
+        });
+
         const list = document.getElementById('contact-list');
         list.innerHTML = '';
-        contacts.forEach(contact => {
+        if (filteredContacts.length === 0) {
+          list.innerHTML = '<p>No contacts found.</p>';
+          return;
+        }
+
+        filteredContacts.forEach(contact => {
+          const firstName = contact.first_name || contact.firstName || 'Unknown';
+          const lastName = contact.last_name || contact.lastName || '';
+          const contactId = contact.id;
+
+          if (!contactId) {
+            console.error('Contact ID missing for contact:', contact);
+            return;
+          }
+
           const li = document.createElement('li');
-          li.innerHTML = `${contact.first_name} ${contact.last_name} <button class="button" onclick="loadContact('${contact.id}')">View</button>`;
+          li.innerHTML = `${firstName} ${lastName} <button class="button" onclick="loadContact('${contactId}')">View</button>`;
           if (activeSubcategory === 'leads') {
-            li.innerHTML += ` <button class="button" onclick="changeToCustomer('${contact.id}')">Change to Customer</button>`;
+            li.innerHTML += ` <button class="button" onclick="changeToCustomer('${contactId}')">Change to Customer</button>`;
           }
           list.appendChild(li);
         });
         document.getElementById('new-contact-btn').style.display = 'block';
       } catch (error) {
         console.error('Error loading contacts:', error);
+        document.getElementById('contact-list').innerHTML = '<p>Error loading contacts.</p>';
       }
     }
 
@@ -124,11 +234,46 @@
         const response = await fetch(url, {
           headers: { Authorization: `Bearer ${apiKey}` },
         });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const contact = await response.json();
-        document.getElementById('firstName').value = contact.first_name || '';
-        document.getElementById('lastName').value = contact.last_name || '';
-        document.getElementById('email').value = contact.email || '';
-        document.getElementById('phone').value = contact.phone || '';
+        console.log('Single Contact Response:', JSON.stringify(contact, null, 2));
+
+        // Standard fields for both Leads and Customers
+        const standardFields = [
+          { label: 'First Name', key: 'first_name', id: 'firstName', value: contact.first_name || contact.firstName || '', required: true },
+          { label: 'Last Name', key: 'last_name', id: 'lastName', value: contact.last_name || contact.lastName || '', required: true },
+          { label: 'Email', key: 'email', id: 'email', value: contact.email || '', type: 'email' },
+          { label: 'Phone', key: 'phone', id: 'phone', value: contact.phone || '', type: 'tel' },
+        ];
+
+        // Render standard fields
+        const standardFieldsDiv = document.getElementById('standard-fields');
+        standardFieldsDiv.innerHTML = standardFields.map(field => `
+          <div class="form-group">
+            <label>${field.label}:</label>
+            <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''}>
+          </div>
+        `).join('');
+
+        // Custom fields for Customers
+        const customFieldsDiv = document.getElementById('custom-fields');
+        if (activeSubcategory === 'customers') {
+          const customFieldValues = contact.customFields || [];
+          customFieldsDiv.innerHTML = customerCustomFields.map(field => {
+            const fieldValue = customFieldValues.find(cf => cf.key === field.key)?.value || '';
+            return `
+              <div class="form-group">
+                <label>${field.label}:</label>
+                ${field.type === 'textarea' ? 
+                  `<textarea id="custom_${field.key}">${fieldValue}</textarea>` : 
+                  `<input type="text" id="custom_${field.key}" value="${fieldValue}">`}
+              </div>
+            `;
+          }).join('');
+        } else {
+          customFieldsDiv.innerHTML = '';
+        }
+
         document.getElementById('form-title').textContent = 'Edit Contact';
         document.getElementById('contact-form').style.display = 'block';
       } catch (error) {
@@ -138,10 +283,22 @@
 
     async function showNewContactForm() {
       selectedContactId = null;
-      document.getElementById('firstName').value = '';
-      document.getElementById('lastName').value = '';
-      document.getElementById('email').value = '';
-      document.getElementById('phone').value = '';
+      const standardFields = [
+        { label: 'First Name', key: 'first_name', id: 'firstName', value: '', required: true },
+        { label: 'Last Name', key: 'last_name', id: 'lastName', value: '', required: true },
+        { label: 'Email', key: 'email', id: 'email', value: '', type: 'email' },
+        { label: 'Phone', key: 'phone', id: 'phone', value: '', type: 'tel' },
+      ];
+
+      const standardFieldsDiv = document.getElementById('standard-fields');
+      standardFieldsDiv.innerHTML = standardFields.map(field => `
+        <div class="form-group">
+          <label>${field.label}:</label>
+          <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''}>
+        </div>
+      `).join('');
+
+      document.getElementById('custom-fields').innerHTML = '';
       document.getElementById('form-title').textContent = 'Create New Contact';
       document.getElementById('contact-form').style.display = 'block';
     }
@@ -155,15 +312,26 @@
         phone: document.getElementById('phone').value,
         tags: [activeSubcategory === 'leads' ? 'new lead' : 'customer'],
       };
+
+      // Include custom fields for Customers
+      if (activeSubcategory === 'customers') {
+        data.customFields = customerCustomFields.map(field => ({
+          key: field.key,
+          value: document.getElementById(`custom_${field.key}`)?.value || '',
+        }));
+      }
+
       const url = selectedContactId
         ? `https://rest.gohighlevel.com/v1/contacts/${selectedContactId}?locationId=${locationId}`
         : `https://rest.gohighlevel.com/v1/contacts?locationId=${locationId}`;
       try {
-        await fetch(url, {
+        const response = await fetch(url, {
           method: selectedContactId ? 'PUT' : 'POST',
           headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        console.log('Save Contact Response:', await response.json());
         closeForm();
         loadContacts();
       } catch (error) {
@@ -177,15 +345,20 @@
         const response = await fetch(url, {
           headers: { Authorization: `Bearer ${apiKey}` },
         });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const contact = await response.json();
+
         let tags = contact.tags || [];
         tags = tags.filter(tag => tag !== 'new lead');
         if (!tags.includes('customer')) tags.push('customer');
-        await fetch(url, {
+
+        const updateResponse = await fetch(url, {
           method: 'PUT',
           headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ tags }),
         });
+        if (!updateResponse.ok) throw new Error(`HTTP error! Status: ${updateResponse.status}`);
+        console.log('Tag Update Response:', await updateResponse.json());
         loadContacts();
       } catch (error) {
         console.error('Error changing to customer:', error);
