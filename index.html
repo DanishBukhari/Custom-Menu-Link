@@ -284,11 +284,7 @@
           const customFieldValues = contact.customField || [];
           const fieldMap = customFieldValues.reduce((map, cf) => {
             const value = cf.value && typeof cf.value === 'object' ? cf.value[Object.keys(cf.value)[0]]?.url || cf.value : cf.value;
-            if (Array.isArray(value)) {
-              map[cf.id] = value;
-            } else {
-              map[cf.id] = value || '';
-            }
+            map[cf.id] = value || '';
             return map;
           }, {});
 
@@ -494,14 +490,17 @@
             }
             return { id: field.id, value: document.getElementById(`custom_${field.id}`)?.value || '' };
           } else if (field.type === 'CHECKBOX' || field.type === 'MULTIPLE_OPTIONS') {
-            const selectedOptions = Array.from(document.getElementById(`custom_${field.id}`).selectedOptions || []).map(opt => opt.value);
-            if (field.type === 'CHECKBOX') {
+            let selectedOptions = [];
+            const selectElement = document.getElementById(`custom_${field.id}`);
+            if (selectElement && selectElement.tagName === 'SELECT' && selectElement.multiple) {
+              selectedOptions = Array.from(selectElement.selectedOptions || []).map(opt => opt.value);
+            } else if (field.type === 'CHECKBOX') {
               field.options.forEach(option => {
                 const checkbox = document.getElementById(`custom_${field.id}_${option}`);
                 if (checkbox && checkbox.checked) selectedOptions.push(option);
               });
             }
-            return { id: field.id, value: selectedOptions };
+            return { id: field.id, value: selectedOptions.length > 0 ? selectedOptions : '' };
           } else {
             return { id: field.id, value: document.getElementById(`custom_${field.id}`)?.value || '' };
           }
