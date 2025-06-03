@@ -24,10 +24,10 @@
     .button:hover {
       transform: scale(1.05);
     }
-    .form-group input, .form-group textarea {
+    .form-group input, .form-group textarea, .form-group select {
       transition: border-color 0.3s ease;
     }
-    .form-group input:focus, .form-group textarea:focus {
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
       border-color: #3b82f6;
       outline: none;
     }
@@ -38,7 +38,7 @@
     <button class="button bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700" onclick="openModal()">Network</button>
 
     <div class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" id="modal" style="display: none;">
-      <div class="modal-content bg-white rounded-lg shadow-2xl w-11/12 max-w-4xl p-6">
+      <div class="modal-content bg-white rounded-lg shadow-2xl w-11/12 max-w-4xl p-6 max-h-[80vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-semibold text-gray-800">Network Contacts</h2>
           <span class="close text-3xl text-gray-500 cursor-pointer hover:text-gray-700" onclick="closeModal()">×</span>
@@ -56,12 +56,14 @@
         <button id="new-contact-btn" class="button bg-green-500 text-white px-4 py-2 rounded-lg mt-2 hover:bg-green-600" style="display: none;" onclick="showNewContactForm()">New Contact</button>
         <div id="contact-form" class="mt-4" style="display: none;">
           <h3 id="form-title" class="text-xl font-semibold text-gray-800 mb-4"></h3>
-          <div id="standard-fields" class="space-y-4"></div>
-          <div id="custom-fields" class="space-y-4 mt-4"></div>
-          <div class="flex space-x-2 mt-4">
-            <button type="submit" class="button bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700" onclick="document.getElementById('contact-form-element').dispatchEvent(new Event('submit'))">Save</button>
-            <button type="button" class="button bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400" onclick="closeForm()">Cancel</button>
-          </div>
+          <form id="contact-form-element">
+            <div id="standard-fields" class="space-y-4"></div>
+            <div id="custom-fields" class="space-y-4 mt-4"></div>
+            <div class="flex space-x-2 mt-4">
+              <button type="submit" class="button bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Save</button>
+              <button type="button" class="button bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400" onclick="closeForm()">Cancel</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -73,69 +75,98 @@
     let activeCategory = 'clients';
     let activeSubcategory = 'leads';
     let selectedContactId = null;
-    let customFieldsMap = {};
-    let customerCustomFields = [];
 
-    // Define all 88 custom fields from Client Intake & Acquisition Form
-    const customFieldLabels = [
-      'Full Name', 'Address', 'Alternate Number', 'Citizenship Status', 'REIQ Checklist', 'Notes',
-      'Upload DL/Passport', 'Alternate Email', 'Preferred Method of Communication', 'Type of Service',
-      'Form 6 Sent?', 'Form 6 Executed', 'Form 6 Sent to All Parties', 'Client Agreement Sent?',
-      'Client Agreement Executed', 'Client Agreement Sent to All Parties', 'Service Fee', 'Fee to be Paid',
-      'Retainer Including GST', 'Retainer Invoice Paid', 'Referral Name', 'Referral Company',
-      'Referral Phone', 'Referral Email', 'Referral Fee Paid?', 'Mortgage Company', 'Name of the Broker',
-      'Address (Mortgage Broker)', 'Phone (Mortgage Broker)', 'Email (Mortgage Broker)', 'Finance Approval',
-      'Date of Expiry', 'Name of the Conveyancer', 'Company (Conveyancer)', 'Address (Conveyancer)',
-      'Phone (Conveyancer)', 'Email (Conveyancer)', 'Name of the Accountant', 'Company (Accountant)',
-      'Address (Accountant)', 'Phone (Accountant)', 'Email (Accountant)', 'Name of the Financial Adviser',
-      'Company (Financial Adviser)', 'Address (Financial Adviser)', 'Phone (Financial Adviser)',
-      'Email (Financial Adviser)', 'Reason for Purchase', 'Strategy Outcomes', 'Tenant', 'Areas/Locations',
-      'Building Type', 'Land Size', 'Budget', 'Time Frame', 'Must Haves', 'Second Choice Must Haves',
-      'Previously Viewed Properties', 'Potential Properties', 'Property Identified', 'CMA Sent?', 'Flood',
-      'Bushfire', 'Heritage', 'Title Search', 'Mortgage Broker Check Complete', 'Contract Sent to Solicitor',
-      'Offer Received by Real Estate Agent', 'Full Name (Client 2)', 'Address (Client 2)',
-      'Full Name (Client 3)', 'Phone (Client 2)', 'Phone (Client 3)', 'Alternate Number (Client 2)',
-      'Alternate Number (Client 3)', 'Email (Client 2)', 'Alternate Email (Client 2)',
-      'Alternate Email (Client 3)', 'Notes (Client 2)', 'Notes (Client 3)', 'Upload DL/Passport (Client 2)',
-      'Upload DL/Passport (Client 3)', 'Citizenship Status (Client 2)', 'Citizenship Status (Client 3)',
-      'REIQ Checklist (Client 2)', 'REIQ Checklist (Client 3)', 'Address (Client 3)', 'Email (Client 3)'
+    // Define all 88 custom fields with their IDs and types
+    const customerCustomFields = [
+      { label: 'Full Name', id: 'EXjXnQEL140VE4XYhaSX', type: 'TEXT' },
+      { label: 'Address', id: 'xiMyfob6XvYdCJ2mUFvs', type: 'LARGE_TEXT' },
+      { label: 'Alternate Number', id: 'jvAsiZOUQaCGJIovm6ow', type: 'PHONE' },
+      { label: 'Citizenship Status', id: 'KZXiIduGXfQa4gcpSAHv', type: 'TEXT' },
+      { label: 'REIQ Checklist', id: 'rxOfHP9T8qdurVaokT2s', type: 'FILE_UPLOAD' },
+      { label: 'Notes', id: 'NvQGPZLuWhQ9yYXKp9ld', type: 'LARGE_TEXT' },
+      { label: 'Upload DL/Passport', id: 'HOhKJUkCUTScTWamVlZf', type: 'FILE_UPLOAD' },
+      { label: 'Alternate email', id: 'PEVvVcPisnmdY3qoYwyR', type: 'TEXT' },
+      { label: 'Preferred Method of Communication', id: 'grhYMh52GpDD8QuNuo0J', type: 'MULTIPLE_OPTIONS', options: ['Email', 'Phone', 'Text', 'In-Person'] },
+      { label: 'Type of Service', id: 'sHX29V5gxwBYO4WMTQHp', type: 'SINGLE_OPTIONS', options: ['Full Service Buyers Advocacy', 'Auction Bidding', 'Negotiation Only'] },
+      { label: 'Form 6 Sent?', id: 'PR7PRh4wuvF9yrMLhaZF', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Form 6 Executed', id: 'KQz5NQgoGq1l6sI8YPk6', type: 'CHECKBOX', options: ['Yes, Signed by all parties'] },
+      { label: 'Form 6 Sent to all parties', id: 'APFoTEdW0JHfH5uJIqUL', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Client Agreement Sent?', id: 'iPFysM90lheoQzV0FOBM', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Client Agreement Executed', id: '4sFw9DsvvygEWyyl2wOx', type: 'CHECKBOX', options: ['Yes, Agreement Signed'] },
+      { label: 'Client Agreement sent to all Parties', id: 'CL0w2AcSvCkjyo4L15ip', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Service Fee', id: 'FLP394K9sPjDT21C0Yda', type: 'TEXT' },
+      { label: 'Fee to be Paid', id: 'E6fHsabXPU5QkUd3f6wI', type: 'SINGLE_OPTIONS', options: ['Unconditional', 'Conditional', 'Not Applicable'] },
+      { label: 'Retainer including GST', id: 'qcWKnqkUOgM3X9bVCrbO', type: 'TEXT' },
+      { label: 'Retainer Invoice Paid', id: 'yGmz10g9dX8itDkh5Emo', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Referral Name', id: '6uIIMjIfV0XQ4jwn1ZXv', type: 'TEXT' },
+      { label: 'Referral Company', id: 'yb56Vm4w6pioj7Ry8xOi', type: 'TEXT' },
+      { label: 'Referral Phone', id: 'mhRM0JSI71O4bE6D9HnA', type: 'PHONE' },
+      { label: 'Referral Email', id: '7Yfw3ndm4LlMZWRt08l1', type: 'TEXT' },
+      { label: 'Referral Fee Paid?', id: '6AlnT4R8lKsHz12XIuht', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Mortgage Company', id: 'lOWvhGItK1DfcYdmEmr5', type: 'TEXT' },
+      { label: 'Name of the Broker', id: 'zF8zaixssgBPmrmaKFv7', type: 'TEXT' },
+      { label: 'Address (Mortgage Broker)', id: 'v6YC1hH9al2CAH2O1YQZ', type: 'LARGE_TEXT' },
+      { label: 'Phone (Mortgage Broker)', id: '4nfCxk7ACGXPJYOhZ98q', type: 'PHONE' },
+      { label: 'Email (Mortgage Broker)', id: 'S2AKVZq7g9sXm7Qnf4ad', type: 'TEXT' },
+      { label: 'Finance Approval', id: 'VDFuiC8FcBXn6A6g0eW9', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Date of Expiry', id: '2jj35L7SgYQVh22CjA4b', type: 'DATE' },
+      { label: 'Name of the Conveyancer', id: '5MfJnwZsjSpGpJNGFqBj', type: 'TEXT' },
+      { label: 'Company (Conveyancer)', id: '5JEWkh4EfSQ1wEc0pfEq', type: 'TEXT' },
+      { label: 'Address (Conveyancer)', id: 'RbnDMwGZxcCw2TAhtXdf', type: 'LARGE_TEXT' },
+      { label: 'Phone (Conveyancer)', id: 'zLWuKlNFCy77I9Rh2JUg', type: 'PHONE' },
+      { label: 'Email (Conveyancer)', id: 'sc3jlus2FEvrZo6bkGGs', type: 'TEXT' },
+      { label: 'Name of the Accountant', id: '4O8RZbvD8yAt9jxsaL8f', type: 'TEXT' },
+      { label: 'Company (Accountant)', id: 'uj1nEbRZRfU61BEAXItg', type: 'TEXT' },
+      { label: 'Address (Accountant)', id: 'yJZJ5PlmZDaHKkz2hy3M', type: 'LARGE_TEXT' },
+      { label: 'Phone (Accountant)', id: 'iE8WWJ9Ye7Z32To1KGoy', type: 'PHONE' },
+      { label: 'Email (Accountant)', id: 'LRS2RQjK5qYL8fWyfxzs', type: 'TEXT' },
+      { label: 'Name of the Financial Adviser', id: 'YInzODdGmRDeWGvtA6kv', type: 'TEXT' },
+      { label: 'Company (Financial Adviser)', id: 'nnxNZEZSg6Nw1sysMzhh', type: 'TEXT' },
+      { label: 'Address (Financial Adviser)', id: 'p61NEhKJLIOyIz7qeqpb', type: 'LARGE_TEXT' },
+      { label: 'Phone (Financial Adviser)', id: 'P1y8L9Xk1N9eRdQ2rKVr', type: 'PHONE' },
+      { label: 'Email (Financial Adviser)', id: 'gINIpN4sR404ahNgyPkX', type: 'TEXT' },
+      { label: 'Reason for Purchase', id: 'ti1qc7zG8ZVBfnkqm7Zd', type: 'MULTIPLE_OPTIONS', options: ['Owner Occupier', 'Investment', 'Holiday Home'] },
+      { label: 'Strategy Outcomes', id: 'uAq6W9XWSaqTU9P5mSxr', type: 'MULTIPLE_OPTIONS', options: ['Renovation Potential', 'Subdivision Potential', 'Development Potential'] },
+      { label: 'Tenant', id: 'jUJ7iCewuxlFttWfPLLu', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Areas/Locations', id: 'fqANWu9PRJHBs0A0PVOe', type: 'LARGE_TEXT' },
+      { label: 'Building Type', id: 'nLNN1njsqcMmImQXDZdU', type: 'LARGE_TEXT' },
+      { label: 'Land Size', id: 'jkLvLtBIenZ66IHg0u8G', type: 'LARGE_TEXT' },
+      { label: 'Budget', id: 'AysRDNDmW7NEmgkxG0Pc', type: 'LARGE_TEXT' },
+      { label: 'Time Frame', id: 'MHQP9pQgsvadprNyXCIy', type: 'LARGE_TEXT' },
+      { label: 'Must Haves', id: 'XITF19lX0YYapZCBT23E', type: 'LARGE_TEXT' },
+      { label: 'Second Choice Must Haves', id: '2GkoU8Lh72AC5BwPSFzf', type: 'LARGE_TEXT' },
+      { label: 'Previously Viewed Properties', id: 'raEuLUqKopdXzxvIreDU', type: 'LARGE_TEXT' },
+      { label: 'Potential Properties', id: 'daYmzLY5IFA9g8n09ONs', type: 'LARGE_TEXT' },
+      { label: 'Property Identified', id: 'Lyv7eAn1tBgDzpToEgdf', type: 'LARGE_TEXT' },
+      { label: 'CMA Sent?', id: 'ccHSnDHKJFi7PZOtn9zt', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Flood', id: 'JNxCzxrxifroeclObyRB', type: 'FILE_UPLOAD' },
+      { label: 'Bushfire', id: 'wapXPv1hnCYDpDK1vfTa', type: 'FILE_UPLOAD' },
+      { label: 'Heritage', id: 'm9i7HQXWY17PfBBFoOwc', type: 'FILE_UPLOAD' },
+      { label: 'Title Search', id: 'txxrIggN291g9OISLz3y', type: 'LARGE_TEXT' },
+      { label: 'Mortgage Broker Check Complete', id: 'zVVmbafhz3TZ1xfOK9yj', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Contract Sent to Solicitor', id: 'wHB4bJhT9kuFPNAHMygP', type: 'LARGE_TEXT' },
+      { label: 'Offer received by real estate agent', id: '634PeulkBMxDwi5Mw9tf', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Full Name (Client 2)', id: 'NcZ9Q0kt2Um0idKhmIhM', type: 'TEXT' },
+      { label: 'Address (Client 2)', id: 'jEH869tIk7awVG3y7L62', type: 'LARGE_TEXT' },
+      { label: 'Full Name (Client 3)', id: '7Jde9fNNqL8K9XHCy7u5', type: 'TEXT' },
+      { label: 'Phone (Client 2)', id: 'OSkhPsIb5CaLsfHFVVVl', type: 'PHONE' },
+      { label: 'Phone (Client 3)', id: 'IKAkpbKPUQfPDGqml4U9', type: 'PHONE' },
+      { label: 'Alternate Number (Client 2)', id: 'rGl3o463R2k6pHA2sUTr', type: 'PHONE' },
+      { label: 'Alternate Number (Client 3)', id: 'BrLRYmiETzuMOpZcJoAj', type: 'PHONE' },
+      { label: 'Email (Client 2)', id: 'I0XR6vaXZl9bDrgbClFn', type: 'TEXT' },
+      { label: 'Alternate email (Client 2)', id: '6G3biDu17n4DTjb3bT4Y', type: 'TEXT' },
+      { label: 'Alternate email (Client 3)', id: 'hH7IcmQZgEwHzIjFJB6j', type: 'TEXT' },
+      { label: 'Notes (Client 2)', id: 'MjyKkWTESS8hNXmjVGwo', type: 'LARGE_TEXT' },
+      { label: 'Notes (Client 3)', id: '2gwL1Xt4gpLXPvIq8l0X', type: 'LARGE_TEXT' },
+      { label: 'Upload DL/Passport (Client 2)', id: '6Kkzjrfw2H9PnKbrHfxZ', type: 'FILE_UPLOAD' },
+      { label: 'Upload DL/Passport (Client 3)', id: 'sLy2EQaKQkHZvTvQc0OS', type: 'FILE_UPLOAD' },
+      { label: 'Citizenship Status (Client 2)', id: 'OfCZ3qfSOkcjb8JXG7Nj', type: 'TEXT' },
+      { label: 'Citizenship Status (Client 3)', id: '5QyH4ryvNdDopxkLa1pT', type: 'TEXT' },
+      { label: 'REIQ Checklist (Client 2)', id: '0TR2XsNuizgdI43JuI9X', type: 'FILE_UPLOAD' },
+      { label: 'REIQ Checklist (Client 3)', id: 'zBRgbclelurPoN84ZqRX', type: 'FILE_UPLOAD' },
+      { label: 'Address (Client 3)', id: 'tVcyZhEtB0G3ydzQB2vi', type: 'LARGE_TEXT' },
+      { label: 'Email (Client 3)', id: '0BgAiLdSVF9JxQ28qibZ', type: 'TEXT' }
     ];
-
-    // Fetch custom fields dynamically and map them
-    async function fetchCustomFields() {
-      const url = `https://rest.gohighlevel.com/v1/custom-fields?locationId=${locationId}`;
-      try {
-        const response = await fetch(url, {
-          headers: { Authorization: `Bearer ${apiKey}` },
-        });
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const data = await response.json();
-        console.log('Custom Fields Response:', JSON.stringify(data, null, 2));
-
-        customFieldsMap = data.customFields.reduce((map, field) => {
-          map[field.label] = field.id;
-          return map;
-        }, {});
-
-        customerCustomFields = customFieldLabels.map(label => {
-          const id = customFieldsMap[label];
-          if (!id) {
-            console.warn(`Custom field "${label}" not found in GHL`);
-            return null;
-          }
-          return {
-            label,
-            id,
-            type: label.includes('Upload') || label.includes('REIQ Checklist') ? 'file' : label.includes('Notes') ? 'textarea' : 'text'
-          };
-        }).filter(field => field !== null);
-      } catch (error) {
-        console.error('Error fetching custom fields:', error);
-      }
-    }
-
-    // Initial fetch of custom fields
-    fetchCustomFields();
 
     function openModal() {
       document.getElementById('modal').style.display = 'flex';
@@ -253,18 +284,22 @@
           const customFieldValues = contact.customField || [];
           const fieldMap = customFieldValues.reduce((map, cf) => {
             const value = cf.value && typeof cf.value === 'object' ? cf.value[Object.keys(cf.value)[0]]?.url || cf.value : cf.value;
-            map[cf.id] = value;
+            if (Array.isArray(value)) {
+              map[cf.id] = value;
+            } else {
+              map[cf.id] = value || '';
+            }
             return map;
           }, {});
 
           // Handle Full Name and Address as computed fields
           const fullNameValue = `${contact.firstName || ''} ${contact.lastName || ''}`.trim();
           const addressComponents = [
-            fieldMap[customFieldsMap['Street Address']] || contact.address1 || '',
-            fieldMap[customFieldsMap['City']] || contact.city || '',
-            fieldMap[customFieldsMap['Country']] || contact.country || '',
-            fieldMap[customFieldsMap['State']] || contact.state || '',
-            fieldMap[customFieldsMap['Postal Code']] || contact.postalCode || ''
+            fieldMap['xiMyfob6XvYdCJ2mUFvs'] || contact.address1 || '',
+            fieldMap['city'] || contact.city || '',
+            fieldMap['country'] || contact.country || '',
+            fieldMap['state'] || contact.state || '',
+            fieldMap['postalCode'] || contact.postalCode || ''
           ].filter(v => v);
           const addressValue = addressComponents.join(', ');
 
@@ -272,7 +307,8 @@
             let fieldValue = fieldMap[field.id] || '';
             if (field.label === 'Full Name') fieldValue = fullNameValue;
             if (field.label === 'Address') fieldValue = addressValue;
-            if (field.type === 'file') {
+
+            if (field.type === 'FILE_UPLOAD') {
               return `
                 <div class="form-group">
                   <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
@@ -280,15 +316,70 @@
                   <input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">
                 </div>
               `;
+            } else if (field.type === 'LARGE_TEXT') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">${fieldValue}</textarea>
+                </div>
+              `;
+            } else if (field.type === 'RADIO' || field.type === 'SINGLE_OPTIONS') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                    <option value="">Select an option</option>
+                    ${field.options.map(option => `
+                      <option value="${option}" ${fieldValue === option ? 'selected' : ''}>${option}</option>
+                    `).join('')}
+                  </select>
+                </div>
+              `;
+            } else if (field.type === 'MULTIPLE_OPTIONS') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <select id="custom_${field.id}" multiple class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                    ${field.options.map(option => `
+                      <option value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'selected' : ''}>${option}</option>
+                    `).join('')}
+                  </select>
+                </div>
+              `;
+            } else if (field.type === 'CHECKBOX') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  ${field.options.map(option => `
+                    <label class="inline-flex items-center mr-4">
+                      <input type="checkbox" id="custom_${field.id}_${option}" value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'checked' : ''} class="mr-2">
+                      <span>${option}</span>
+                    </label>
+                  `).join('')}
+                </div>
+              `;
+            } else if (field.type === 'DATE') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <input type="date" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                </div>
+              `;
+            } else if (field.type === 'PHONE') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <input type="tel" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                </div>
+              `;
+            } else {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <input type="text" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                </div>
+              `;
             }
-            return `
-              <div class="form-group">
-                <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                ${field.type === 'textarea' ? 
-                  `<textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">${fieldValue}</textarea>` : 
-                  `<input type="text" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">`}
-              </div>
-            `;
           }).join('');
         } else {
           customFieldsDiv.innerHTML = '';
@@ -322,10 +413,30 @@
         customerCustomFields.map(field => `
           <div class="form-group">
             <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-            ${field.type === 'file' ? 
+            ${field.type === 'FILE_UPLOAD' ? 
               `<input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">` :
-              field.type === 'textarea' ? 
-              `<textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500"></textarea>` : 
+              field.type === 'LARGE_TEXT' ? 
+              `<textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500"></textarea>` :
+              field.type === 'RADIO' || field.type === 'SINGLE_OPTIONS' ? 
+              `<select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                <option value="">Select an option</option>
+                ${field.options.map(option => `<option value="${option}">${option}</option>`).join('')}
+              </select>` :
+              field.type === 'MULTIPLE_OPTIONS' ? 
+              `<select id="custom_${field.id}" multiple class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                ${field.options.map(option => `<option value="${option}">${option}</option>`).join('')}
+              </select>` :
+              field.type === 'CHECKBOX' ? 
+              field.options.map(option => `
+                <label class="inline-flex items-center mr-4">
+                  <input type="checkbox" id="custom_${field.id}_${option}" value="${option}" class="mr-2">
+                  <span>${option}</span>
+                </label>
+              `).join('') :
+              field.type === 'DATE' ? 
+              `<input type="date" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">` :
+              field.type === 'PHONE' ? 
+              `<input type="tel" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">` :
               `<input type="text" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">`}
           </div>
         `).join('') : '';
@@ -333,10 +444,8 @@
       document.getElementById('contact-form').style.display = 'block';
     }
 
-    document.addEventListener('submit', async (e) => {
+    document.getElementById('contact-form-element').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (e.target.id !== 'contact-form-element') return;
-
       const data = {
         firstName: document.getElementById('firstName').value,
         lastName: document.getElementById('lastName').value,
@@ -346,16 +455,16 @@
       };
 
       // Construct address from component fields if needed
-      const addressFields = ['Street Address', 'City', 'Country', 'State', 'Postal Code'].map(label => customFieldsMap[label]);
+      const addressFields = ['xiMyfob6XvYdCJ2mUFvs', 'city', 'country', 'state', 'postalCode'];
       if (activeSubcategory === 'customers' && addressFields.some(id => document.getElementById(`custom_${id}`))) {
         const address = addressFields.map(id => document.getElementById(`custom_${id}`)?.value || '').filter(v => v).join(', ');
         data.customField = data.customField || [];
-        data.customField.push({ id: customFieldsMap['Address'], value: address || '' });
+        data.customField.push({ id: 'xiMyfob6XvYdCJ2mUFvs', value: address || '' });
       }
 
       if (activeSubcategory === 'customers') {
         data.customField = await Promise.all(customerCustomFields.map(async field => {
-          if (field.type === 'file') {
+          if (field.type === 'FILE_UPLOAD') {
             const fileInput = document.getElementById(`custom_${field.id}_new`);
             if (fileInput && fileInput.files.length > 0) {
               const formData = new FormData();
@@ -364,7 +473,7 @@
               formData.append('fieldId', field.id);
 
               try {
-                const response = await fetch('https://custom-menu-backend-661398661b06.herokuapp.com/upload', { // Replace with your Heroku app URL
+                const response = await fetch('https://your-app-name.herokuapp.com/upload', { // Replace with your Heroku app URL
                   method: 'POST',
                   body: formData,
                 });
@@ -384,10 +493,20 @@
               }
             }
             return { id: field.id, value: document.getElementById(`custom_${field.id}`)?.value || '' };
+          } else if (field.type === 'CHECKBOX' || field.type === 'MULTIPLE_OPTIONS') {
+            const selectedOptions = Array.from(document.getElementById(`custom_${field.id}`).selectedOptions || []).map(opt => opt.value);
+            if (field.type === 'CHECKBOX') {
+              field.options.forEach(option => {
+                const checkbox = document.getElementById(`custom_${field.id}_${option}`);
+                if (checkbox && checkbox.checked) selectedOptions.push(option);
+              });
+            }
+            return { id: field.id, value: selectedOptions };
+          } else {
+            return { id: field.id, value: document.getElementById(`custom_${field.id}`)?.value || '' };
           }
-          return { id: field.id, value: document.getElementById(`custom_${field.id}`)?.value || '' };
         }));
-        data.customField = data.customField.filter(cf => cf.value !== '');
+        data.customField = data.customField.filter(cf => cf.value !== '' && cf.value.length !== 0);
       }
 
       const url = selectedContactId
