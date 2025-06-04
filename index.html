@@ -252,142 +252,146 @@
     }
 
     async function loadContact(contactId) {
-      selectedContactId = contactId;
-      const url = `https://rest.gohighlevel.com/v1/contacts/${contactId}?locationId=${locationId}&include=customFields`;
-      try {
-        const response = await fetch(url, {
-          headers: { Authorization: `Bearer ${apiKey}` },
-        });
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const data = await response.json();
-        const contact = data.contact || data;
-        console.log('Single Contact Response:', JSON.stringify(contact, null, 2));
+  selectedContactId = contactId;
+  const url = `https://rest.gohighlevel.com/v1/contacts/${contactId}?locationId=${locationId}&include=customFields`;
+  try {
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    const data = await response.json();
+    const contact = data.contact || data;
+    console.log('Single Contact Response:', JSON.stringify(contact, null, 2));
 
-        // Standard fields
-        const standardFields = [
-          { label: 'First Name', key: 'firstName', id: 'firstName', value: contact.firstName || '', required: true },
-          { label: 'Last Name', key: 'lastName', id: 'lastName', value: contact.lastName || '', required: true },
-          { label: 'Email', key: 'email', id: 'email', value: contact.email || '', type: 'email' },
-          { label: 'Phone', key: 'phone', id: 'phone', value: contact.phone || '', type: 'tel' },
-        ];
+    // Standard fields
+    const standardFields = [
+      { label: 'First Name', key: 'firstName', id: 'firstName', value: contact.firstName || '', required: true },
+      { label: 'Last Name', key: 'lastName', id: 'lastName', value: contact.lastName || '', required: true },
+      { label: 'Email', key: 'email', id: 'email', value: contact.email || '', type: 'email' },
+      { label: 'Phone', key: 'phone', id: 'phone', value: contact.phone || '', type: 'tel' },
+    ];
 
-        document.getElementById('standard-fields').innerHTML = standardFields.map(field => `
-          <div class="form-group">
-            <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-            <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
-          </div>
-        `).join('');
+    document.getElementById('standard-fields').innerHTML = standardFields.map(field => `
+      <div class="form-group">
+        <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+        <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+      </div>
+    `).join('');
 
-        // Custom fields for Customers
-        const customFieldsDiv = document.getElementById('custom-fields');
-        if (activeSubcategory === 'customers') {
-          const customFieldValues = contact.customField || [];
-          const fieldMap = customFieldValues.reduce((map, cf) => {
-            const value = cf.value && typeof cf.value === 'object' ? cf.value[Object.keys(cf.value)[0]]?.url || cf.value : cf.value;
-            map[cf.id] = value || '';
-            return map;
-          }, {});
+    // Custom fields for Customers
+    const customFieldsDiv = document.getElementById('custom-fields');
+    if (activeSubcategory === 'customers') {
+      const customFieldValues = contact.customField || [];
+      const fieldMap = customFieldValues.reduce((map, cf) => {
+        const value = cf.value && typeof cf.value === 'object' ? (cf.value[Object.keys(cf.value)[0]]?.url || cf.value) : cf.value;
+        map[cf.id] = value || '';
+        return map;
+      }, {});
 
-          // Handle Full Name and Address as computed fields
-          const fullNameValue = `${contact.firstName || ''} ${contact.lastName || ''}`.trim();
-          const addressComponents = [
-            fieldMap['xiMyfob6XvYdCJ2mUFvs'] || contact.address1 || '',
-            fieldMap['city'] || contact.city || '',
-            fieldMap['country'] || contact.country || '',
-            fieldMap['state'] || contact.state || '',
-            fieldMap['postalCode'] || contact.postalCode || ''
-          ].filter(v => v);
-          const addressValue = addressComponents.join(', ');
+      // Build address using existing custom field value as base
+      let addressValue = fieldMap['xiMyfob6XvYdCJ2mUFvs'] || ''; // Start with existing Address custom field
+      const hasCountry = addressValue.match(/,\s*(AU|Australia)$/i); // Check if country is already present
 
-          document.getElementById('custom-fields').innerHTML = customerCustomFields.map(field => {
-            let fieldValue = fieldMap[field.id] || '';
-            if (field.label === 'Full Name') fieldValue = fullNameValue;
-            if (field.label === 'Address') fieldValue = addressValue;
+      // Append components only if they add new information
+      const components = [
+        contact.address1 && !addressValue.includes(contact.address1) ? contact.address1 : '',
+        contact.city && !addressValue.includes(contact.city) ? contact.city : '',
+        contact.state && !addressValue.includes(contact.state) ? contact.state : '',
+        contact.postalCode && !addressValue.includes(contact.postalCode) ? contact.postalCode : '',
+        !hasCountry && !contact.country ? 'AU' : (contact.country && !addressValue.includes(contact.country) ? contact.country : '') // Add AU only if no country exists, avoid duplication
+      ].filter(v => v).join(', ');
 
-            if (field.type === 'FILE_UPLOAD') {
-              return `
-                <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <p class="file-preview mb-2">${fieldValue ? `<a href="${fieldValue}" target="_blank" class="text-blue-500 hover:underline">${fieldValue.split('/').pop()}</a>` : 'No file uploaded'}</p>
-                  <input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">
+      if (components && !addressValue) {
+        addressValue = components; // Set address if completely new
+      } else if (components) {
+        addressValue = [addressValue, components].filter(v => v).join(', ').trim();
+      }
+
+      document.getElementById('custom-fields').innerHTML = customerCustomFields.map(field => {
+        let fieldValue = fieldMap[field.id] || '';
+        if (field.label === 'Full Name') fieldValue = `${contact.firstName || ''} ${contact.lastName || ''}`.trim();
+        if (field.label === 'Address') fieldValue = addressValue;
+
+        if (field.type === 'FILE_UPLOAD') {
+          return `
+            <div class="form-group">
+              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+              <p class="file-preview mb-2">${fieldValue ? `<a href="${fieldValue}" target="_blank" class="text-blue-500 hover:underline">${fieldValue.split('/').pop()}</a>` : 'No file uploaded'}</p>
+              <input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">
+            </div>
+          `;
+        } else if (field.type === 'LARGE_TEXT') {
+          return `
+            <div class="form-group">
+              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+              <textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">${fieldValue}</textarea>
+            </div>
+          `;
+        } else if (field.type === 'SINGLE_OPTIONS') {
+          const selectedValue = Array.isArray(fieldValue) ? fieldValue[0] : fieldValue;
+          return `
+            <div class="form-group">
+              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+              <div class="relative">
+                <div class="flex items-center justify-between w-full p-2 border border-gray-300 rounded-lg bg-white cursor-pointer" onclick="toggleDropdown('custom_${field.id}_dropdown')">
+                  <span id="custom_${field.id}_selected" class="text-gray-800">${selectedValue || 'Select an option'}</span>
+                  <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
-              `;
-            } else if (field.type === 'LARGE_TEXT') {
-              return `
-                <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">${fieldValue}</textarea>
-                </div>
-              `;
-            } else if (field.type === 'RADIO' || field.type === 'SINGLE_OPTIONS') {
-              return `
-                <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
-                    <option value="">Select an option</option>
-                    ${field.options.map(option => `
-                      <option value="${option}" ${fieldValue === option ? 'selected' : ''}>${option}</option>
-                    `).join('')}
-                  </select>
-                </div>
-              `;
-            } else if (field.type === 'MULTIPLE_OPTIONS') {
-              return `
-                <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <select id="custom_${field.id}" multiple class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
-                    ${field.options.map(option => `
-                      <option value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'selected' : ''}>${option}</option>
-                    `).join('')}
-                  </select>
-                </div>
-              `;
-            } else if (field.type === 'CHECKBOX') {
-              return `
-                <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                <div id="custom_${field.id}_dropdown" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden">
                   ${field.options.map(option => `
-                    <label class="inline-flex items-center mr-4">
-                      <input type="checkbox" id="custom_${field.id}_${option}" value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'checked' : ''} class="mr-2">
-                      <span>${option}</span>
-                    </label>
+                    <div class="p-2 hover:bg-gray-100 cursor-pointer" onclick="selectOption('custom_${field.id}', '${option}')">${option}</div>
                   `).join('')}
                 </div>
-              `;
-            } else if (field.type === 'DATE') {
-              return `
-                <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <input type="date" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
-                </div>
-              `;
-            } else if (field.type === 'PHONE') {
-              return `
-                <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <input type="tel" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
-                </div>
-              `;
-            } else {
-              return `
-                <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <input type="text" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
-                </div>
-              `;
-            }
-          }).join('');
+              </div>
+              <input type="hidden" id="custom_${field.id}" value="${selectedValue || ''}">
+            </div>
+          `;
+        } else if (field.type === 'CHECKBOX') {
+          return `
+            <div class="form-group">
+              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+              ${field.options.map(option => `
+                <label class="inline-flex items-center mr-4">
+                  <input type="checkbox" id="custom_${field.id}_${option}" value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'checked' : ''} class="mr-2">
+                  <span>${option}</span>
+                </label>
+              `).join('')}
+            </div>
+          `;
+        } else if (field.type === 'DATE') {
+          return `
+            <div class="form-group">
+              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+              <input type="date" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+            </div>
+          `;
+        } else if (field.type === 'PHONE') {
+          return `
+            <div class="form-group">
+              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+              <input type="tel" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+            </div>
+          `;
         } else {
-          customFieldsDiv.innerHTML = '';
+          return `
+            <div class="form-group">
+              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+              <input type="text" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+            </div>
+          `;
         }
-
-        document.getElementById('form-title').textContent = 'Edit Contact';
-        document.getElementById('contact-form').style.display = 'block';
-      } catch (error) {
-        console.error('Error loading contact:', error);
-        document.getElementById('contact-form').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contact.</p>';
-      }
+      }).join('');
+    } else {
+      customFieldsDiv.innerHTML = '';
     }
+
+    document.getElementById('form-title').textContent = 'Edit Contact';
+    document.getElementById('contact-form').style.display = 'block';
+  } catch (error) {
+    console.error('Error loading contact:', error);
+    document.getElementById('contact-form').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contact.</p>';
+  }
+}
 
     async function showNewContactForm() {
       selectedContactId = null;
