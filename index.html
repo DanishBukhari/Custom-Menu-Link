@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Network Interface</title>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Custom styles for additional polish */
     .modal {
       transition: opacity 0.3s ease-in-out;
     }
@@ -30,6 +28,14 @@
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
       border-color: #3b82f6;
       outline: none;
+    }
+    .form-actions {
+      position: sticky;
+      bottom: -5%;
+      background-color: white;
+      padding: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+      z-index: 10;
     }
   </style>
 </head>
@@ -59,7 +65,7 @@
           <form id="contact-form-element">
             <div id="standard-fields" class="space-y-4"></div>
             <div id="custom-fields" class="space-y-4 mt-4"></div>
-            <div class="flex space-x-2 mt-4">
+            <div class="form-actions flex space-x-2">
               <button type="submit" class="button bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Save</button>
               <button type="button" class="button bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400" onclick="closeForm()">Cancel</button>
             </div>
@@ -76,7 +82,6 @@
     let activeSubcategory = 'leads';
     let selectedContactId = null;
 
-    // Define all 88 custom fields with their IDs and types
     const customerCustomFields = [
       { label: 'Full Name', id: 'EXjXnQEL140VE4XYhaSX', type: 'TEXT' },
       { label: 'Address', id: 'xiMyfob6XvYdCJ2mUFvs', type: 'LARGE_TEXT' },
@@ -223,8 +228,6 @@
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
-        console.log('API Response:', JSON.stringify(data, null, 2));
-
         const contacts = data.contacts || (data.contact ? [data.contact] : []);
         const filteredContacts = contacts.filter(contact => (contact.tags || []).includes(tag));
 
@@ -252,146 +255,151 @@
     }
 
     async function loadContact(contactId) {
-  selectedContactId = contactId;
-  const url = `https://rest.gohighlevel.com/v1/contacts/${contactId}?locationId=${locationId}&include=customFields`;
-  try {
-    const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${apiKey}` },
-    });
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    const data = await response.json();
-    const contact = data.contact || data;
-    console.log('Single Contact Response:', JSON.stringify(contact, null, 2));
+      selectedContactId = contactId;
+      const url = `https://rest.gohighlevel.com/v1/contacts/${contactId}?locationId=${locationId}&include=customFields`;
+      try {
+        const response = await fetch(url, {
+          headers: { Authorization: `Bearer ${apiKey}` },
+        });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        const contact = data.contact || data;
 
-    // Standard fields
-    const standardFields = [
-      { label: 'First Name', key: 'firstName', id: 'firstName', value: contact.firstName || '', required: true },
-      { label: 'Last Name', key: 'lastName', id: 'lastName', value: contact.lastName || '', required: true },
-      { label: 'Email', key: 'email', id: 'email', value: contact.email || '', type: 'email' },
-      { label: 'Phone', key: 'phone', id: 'phone', value: contact.phone || '', type: 'tel' },
-    ];
+        const standardFields = [
+          { label: 'First Name', key: 'firstName', id: 'firstName', value: contact.firstName || '', required: true },
+          { label: 'Last Name', key: 'lastName', id: 'lastName', value: contact.lastName || '', required: true },
+          { label: 'Email', key: 'email', id: 'email', value: contact.email || '', type: 'email' },
+          { label: 'Phone', key: 'phone', id: 'phone', value: contact.phone || '', type: 'tel' },
+        ];
 
-    document.getElementById('standard-fields').innerHTML = standardFields.map(field => `
-      <div class="form-group">
-        <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-        <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
-      </div>
-    `).join('');
+        document.getElementById('standard-fields').innerHTML = standardFields.map(field => `
+          <div class="form-group">
+            <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+            <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+          </div>
+        `).join('');
 
-    // Custom fields for Customers
-    const customFieldsDiv = document.getElementById('custom-fields');
-    if (activeSubcategory === 'customers') {
-      const customFieldValues = contact.customField || [];
-      const fieldMap = customFieldValues.reduce((map, cf) => {
-        const value = cf.value && typeof cf.value === 'object' ? (cf.value[Object.keys(cf.value)[0]]?.url || cf.value) : cf.value;
-        map[cf.id] = value || '';
-        return map;
-      }, {});
+        const customFieldsDiv = document.getElementById('custom-fields');
+        if (activeSubcategory === 'customers') {
+          const customFieldValues = contact.customField || [];
+          const fieldMap = customFieldValues.reduce((map, cf) => {
+            const value = cf.value && typeof cf.value === 'object' ? (cf.value[Object.keys(cf.value)[0]]?.url || cf.value) : cf.value;
+            map[cf.id] = value || '';
+            return map;
+          }, {});
 
-      // Build address using existing custom field value as base
-      let addressValue = fieldMap['xiMyfob6XvYdCJ2mUFvs'] || ''; // Start with existing Address custom field
-      const hasCountry = addressValue.match(/,\s*(AU|Australia)$/i); // Check if country is already present
+          let addressValue = fieldMap['xiMyfob6XvYdCJ2mUFvs'] || '';
+          const hasCountry = addressValue.match(/,\s*(AU|Australia)$/i);
+          const components = [
+            contact.address1 && !addressValue.includes(contact.address1) ? contact.address1 : '',
+            contact.city && !addressValue.includes(contact.city) ? contact.city : '',
+            contact.state && !addressValue.includes(contact.state) ? contact.state : '',
+            contact.postalCode && !addressValue.includes(contact.postalCode) ? contact.postalCode : '',
+            !hasCountry && !contact.country ? 'AU' : (contact.country && !addressValue.includes(contact.country) ? contact.country : '')
+          ].filter(v => v).join(', ');
+          if (components && !addressValue) addressValue = components;
+          else if (components) addressValue = [addressValue, components].filter(v => v).join(', ').trim();
 
-      // Append components only if they add new information
-      const components = [
-        contact.address1 && !addressValue.includes(contact.address1) ? contact.address1 : '',
-        contact.city && !addressValue.includes(contact.city) ? contact.city : '',
-        contact.state && !addressValue.includes(contact.state) ? contact.state : '',
-        contact.postalCode && !addressValue.includes(contact.postalCode) ? contact.postalCode : '',
-        !hasCountry && !contact.country ? 'AU' : (contact.country && !addressValue.includes(contact.country) ? contact.country : '') // Add AU only if no country exists, avoid duplication
-      ].filter(v => v).join(', ');
+          customFieldsDiv.innerHTML = customerCustomFields.map(field => {
+            let fieldValue = fieldMap[field.id] || '';
+            if (field.label === 'Full Name') fieldValue = `${contact.firstName || ''} ${contact.lastName || ''}`.trim();
+            if (field.label === 'Address') fieldValue = addressValue;
 
-      if (components && !addressValue) {
-        addressValue = components; // Set address if completely new
-      } else if (components) {
-        addressValue = [addressValue, components].filter(v => v).join(', ').trim();
-      }
-
-      document.getElementById('custom-fields').innerHTML = customerCustomFields.map(field => {
-        let fieldValue = fieldMap[field.id] || '';
-        if (field.label === 'Full Name') fieldValue = `${contact.firstName || ''} ${contact.lastName || ''}`.trim();
-        if (field.label === 'Address') fieldValue = addressValue;
-
-        if (field.type === 'FILE_UPLOAD') {
-          return `
-            <div class="form-group">
-              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-              <p class="file-preview mb-2">${fieldValue ? `<a href="${fieldValue}" target="_blank" class="text-blue-500 hover:underline">${fieldValue.split('/').pop()}</a>` : 'No file uploaded'}</p>
-              <input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">
-            </div>
-          `;
-        } else if (field.type === 'LARGE_TEXT') {
-          return `
-            <div class="form-group">
-              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-              <textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">${fieldValue}</textarea>
-            </div>
-          `;
-        } else if (field.type === 'SINGLE_OPTIONS') {
-          const selectedValue = Array.isArray(fieldValue) ? fieldValue[0] : fieldValue;
-          return `
-            <div class="form-group">
-              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-              <div class="relative">
-                <div class="flex items-center justify-between w-full p-2 border border-gray-300 rounded-lg bg-white cursor-pointer" onclick="toggleDropdown('custom_${field.id}_dropdown')">
-                  <span id="custom_${field.id}_selected" class="text-gray-800">${selectedValue || 'Select an option'}</span>
-                  <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            if (field.type === 'FILE_UPLOAD') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <p class="file-preview mb-2">${fieldValue ? `<a href="${fieldValue}" target="_blank" class="text-blue-500 hover:underline">${fieldValue.split('/').pop()}</a>` : 'No file uploaded'}</p>
+                  <input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">
                 </div>
-                <div id="custom_${field.id}_dropdown" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden">
+              `;
+            } else if (field.type === 'LARGE_TEXT') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">${fieldValue}</textarea>
+                </div>
+              `;
+            } else if (field.type === 'SINGLE_OPTIONS') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                    <option value="">Select an option</option>
+                    ${field.options.map(option => `<option value="${option}" ${fieldValue === option ? 'selected' : ''}>${option}</option>`).join('')}
+                  </select>
+                </div>
+              `;
+            } else if (field.type === 'RADIO') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
                   ${field.options.map(option => `
-                    <div class="p-2 hover:bg-gray-100 cursor-pointer" onclick="selectOption('custom_${field.id}', '${option}')">${option}</div>
+                    <label class="inline-flex items-center mr-4">
+                      <input type="radio" name="custom_${field.id}" value="${option}" ${fieldValue === option ? 'checked' : ''} class="mr-2">
+                      <span>${option}</span>
+                    </label>
                   `).join('')}
                 </div>
-              </div>
-              <input type="hidden" id="custom_${field.id}" value="${selectedValue || ''}">
-            </div>
-          `;
-        } else if (field.type === 'CHECKBOX') {
-          return `
-            <div class="form-group">
-              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-              ${field.options.map(option => `
-                <label class="inline-flex items-center mr-4">
-                  <input type="checkbox" id="custom_${field.id}_${option}" value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'checked' : ''} class="mr-2">
-                  <span>${option}</span>
-                </label>
-              `).join('')}
-            </div>
-          `;
-        } else if (field.type === 'DATE') {
-          return `
-            <div class="form-group">
-              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-              <input type="date" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
-            </div>
-          `;
-        } else if (field.type === 'PHONE') {
-          return `
-            <div class="form-group">
-              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-              <input type="tel" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
-            </div>
-          `;
+              `;
+            } else if (field.type === 'MULTIPLE_OPTIONS') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  ${field.options.map(option => `
+                    <label class="inline-flex items-center mr-4 mb-2">
+                      <input type="checkbox" name="custom_${field.id}" value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'checked' : ''} class="mr-2">
+                      <span>${option}</span>
+                    </label>
+                  `).join('')}
+                </div>
+              `;
+            } else if (field.type === 'CHECKBOX') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  ${field.options.map(option => `
+                    <label class="inline-flex items-center mr-4 mb-2">
+                      <input type="checkbox" name="custom_${field.id}" value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'checked' : ''} class="mr-2">
+                      <span>${option}</span>
+                    </label>
+                  `).join('')}
+                </div>
+              `;
+            } else if (field.type === 'DATE') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <input type="date" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                </div>
+              `;
+            } else if (field.type === 'PHONE') {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <input type="tel" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                </div>
+              `;
+            } else {
+              return `
+                <div class="form-group">
+                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <input type="text" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                </div>
+              `;
+            }
+          }).join('');
         } else {
-          return `
-            <div class="form-group">
-              <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-              <input type="text" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
-            </div>
-          `;
+          customFieldsDiv.innerHTML = '';
         }
-      }).join('');
-    } else {
-      customFieldsDiv.innerHTML = '';
-    }
 
-    document.getElementById('form-title').textContent = 'Edit Contact';
-    document.getElementById('contact-form').style.display = 'block';
-  } catch (error) {
-    console.error('Error loading contact:', error);
-    document.getElementById('contact-form').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contact.</p>';
-  }
-}
+        document.getElementById('form-title').textContent = 'Edit Contact';
+        document.getElementById('contact-form').style.display = 'block';
+      } catch (error) {
+        console.error('Error loading contact:', error);
+        document.getElementById('contact-form').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contact.</p>';
+      }
+    }
 
     async function showNewContactForm() {
       selectedContactId = null;
@@ -415,27 +423,30 @@
             <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
             ${field.type === 'FILE_UPLOAD' ? 
               `<input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">` :
-              field.type === 'LARGE_TEXT' ? 
+            field.type === 'LARGE_TEXT' ? 
               `<textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500"></textarea>` :
-              field.type === 'RADIO' || field.type === 'SINGLE_OPTIONS' ? 
+            field.type === 'SINGLE_OPTIONS' ? 
               `<select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
                 <option value="">Select an option</option>
                 ${field.options.map(option => `<option value="${option}">${option}</option>`).join('')}
               </select>` :
-              field.type === 'MULTIPLE_OPTIONS' ? 
-              `<select id="custom_${field.id}" multiple class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
-                ${field.options.map(option => `<option value="${option}">${option}</option>`).join('')}
-              </select>` :
-              field.type === 'CHECKBOX' ? 
+            field.type === 'RADIO' ? 
               field.options.map(option => `
-                <label class="inline-flex items-center mr-4">
-                  <input type="checkbox" id="custom_${field.id}_${option}" value="${option}" class="mr-2">
+                <label class="inline-flex items-center mr-4 mb-2">
+                  <input type="radio" name="custom_${field.id}" value="${option}" class="mr-2">
                   <span>${option}</span>
                 </label>
               `).join('') :
-              field.type === 'DATE' ? 
+            field.type === 'MULTIPLE_OPTIONS' || field.type === 'CHECKBOX' ? 
+              field.options.map(option => `
+                <label class="inline-flex items-center mr-4 mb-2">
+                  <input type="checkbox" name="custom_${field.id}" value="${option}" class="mr-2">
+                  <span>${option}</span>
+                </label>
+              `).join('') :
+            field.type === 'DATE' ? 
               `<input type="date" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">` :
-              field.type === 'PHONE' ? 
+            field.type === 'PHONE' ? 
               `<input type="tel" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">` :
               `<input type="text" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">`}
           </div>
@@ -444,98 +455,94 @@
       document.getElementById('contact-form').style.display = 'block';
     }
 
-   document.getElementById('contact-form-element').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const data = {
-    firstName: document.getElementById('firstName').value,
-    lastName: document.getElementById('lastName').value,
-    email: document.getElementById('email').value,
-    phone: document.getElementById('phone').value,
-    tags: [activeSubcategory === 'leads' ? 'new lead' : 'customer'],
-  };
+    document.getElementById('contact-form-element').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        tags: [activeSubcategory === 'leads' ? 'new lead' : 'customer'],
+      };
 
-  // Construct address from component fields if needed
-  const addressFields = ['xiMyfob6XvYdCJ2mUFvs', 'city', 'country', 'state', 'postalCode'];
-  if (activeSubcategory === 'customers' && addressFields.some(id => document.getElementById(`custom_${id}`))) {
-    const address = addressFields.map(id => document.getElementById(`custom_${id}`)?.value || '').filter(v => v).join(', ');
-    data.customField = data.customField || [];
-    data.customField.push({ id: 'xiMyfob6XvYdCJ2mUFvs', value: address || '' });
-  }
-
-  if (activeSubcategory === 'customers') {
-    data.customField = await Promise.all(customerCustomFields.map(async field => {
-      if (field.type === 'FILE_UPLOAD') {
-        const fileInput = document.getElementById(`custom_${field.id}_new`);
-        if (fileInput && fileInput.files.length > 0) {
-          const formData = new FormData();
-          formData.append('file', fileInput.files[0], fileInput.files[0].name);
-          formData.append('contactId', selectedContactId || '');
-          formData.append('fieldId', field.id);
-          formData.append('locationId', locationId);
-
-          try {
-            const response = await fetch('https://custom-menu-backend-661398661b06.herokuapp.com/upload', {
-              method: 'POST',
-              body: formData,
-            });
-            if (!response.ok) {
-              const errorData = await response.json();
-              console.error('Upload error response:', errorData);
-              throw new Error(`Upload failed: ${errorData.error || response.statusText}`);
-            }
-            const result = await response.json();
-            if (result.url) {
-              const preview = fileInput.parentElement.querySelector('.file-preview');
-              if (preview) {
-                preview.innerHTML = `<a href="${result.url}" target="_blank" class="text-blue-500 hover:underline">${result.url.split('/').pop()}</a>`;
-              }
-              return { id: field.id, value: result.url };
-            }
-            throw new Error('Upload failed: No URL returned');
-          } catch (error) {
-            console.error('File upload error:', error.message);
-            return { id: field.id, value: '' };
-          }
-        }
-        return { id: field.id, value: document.getElementById(`custom_${field.id}`)?.value || '' };
-      } else if (field.type === 'CHECKBOX' || field.type === 'SINGLE_OPTIONS') {
-        let selectedOptions = [];
-        const selectElement = document.getElementById(`custom_${field.id}`);
-        if (selectElement && selectElement.tagName === 'SELECT' && !selectElement.multiple) {
-          selectedOptions = selectElement.value ? [selectElement.value] : [];
-        } else if (field.type === 'CHECKBOX') {
-          field.options.forEach(option => {
-            const checkbox = document.getElementById(`custom_${field.id}_${option}`);
-            if (checkbox && checkbox.checked) selectedOptions.push(option);
-          });
-        }
-        return { id: field.id, value: selectedOptions.length > 0 ? selectedOptions : '' };
-      } else {
-        return { id: field.id, value: document.getElementById(`custom_${field.id}`)?.value || '' };
+      const addressFields = ['xiMyfob6XvYdCJ2mUFvs', 'city', 'country', 'state', 'postalCode'];
+      if (activeSubcategory === 'customers' && addressFields.some(id => document.getElementById(`custom_${id}`))) {
+        const address = addressFields.map(id => document.getElementById(`custom_${id}`)?.value || '').filter(v => v).join(', ');
+        data.customField = data.customField || [];
+        data.customField.push({ id: 'xiMyfob6XvYdCJ2mUFvs', value: address || '' });
       }
-    }));
-    data.customField = data.customField.filter(cf => cf.value !== '' && cf.value.length !== 0);
-  }
 
-  const url = selectedContactId
-    ? `https://rest.gohighlevel.com/v1/contacts/${selectedContactId}?locationId=${locationId}`
-    : `https://rest.gohighlevel.com/v1/contacts?locationId=${locationId}`;
-  try {
-    const response = await fetch(url, {
-      method: selectedContactId ? 'PUT' : 'POST',
-      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      if (activeSubcategory === 'customers') {
+        data.customField = await Promise.all(customerCustomFields.map(async field => {
+          if (field.type === 'FILE_UPLOAD') {
+            const fileInput = document.getElementById(`custom_${field.id}_new`);
+            if (fileInput && fileInput.files.length > 0) {
+              const formData = new FormData();
+              formData.append('file', fileInput.files[0], fileInput.files[0].name);
+              formData.append('contactId', selectedContactId || '');
+              formData.append('fieldId', field.id);
+              formData.append('locationId', locationId);
+
+              try {
+                const response = await fetch('https://custom-menu-backend-661398661b06.herokuapp.com/upload', {
+                  method: 'POST',
+                  body: formData,
+                });
+                if (!response.ok) throw new Error(`Upload failed: ${response.statusText}`);
+                const result = await response.json();
+                if (result.url) {
+                  const preview = fileInput.parentElement.querySelector('.file-preview');
+                  if (preview) {
+                    preview.innerHTML = `<a href="${result.url}" target="_blank" class="text-blue-500 hover:underline">${result.url.split('/').pop()}</a>`;
+                  }
+                  return { id: field.id, value: result.url };
+                }
+                throw new Error('Upload failed: No URL returned');
+              } catch (error) {
+                console.error('File upload error:', error.message);
+                return { id: field.id, value: '' };
+              }
+            }
+            return { id: field.id, value: document.getElementById(`custom_${field.id}`)?.value || '' };
+          } else if (field.type === 'SINGLE_OPTIONS') {
+            const selectElement = document.getElementById(`custom_${field.id}`);
+            const value = selectElement ? selectElement.value : '';
+            return { id: field.id, value };
+          } else if (field.type === 'RADIO') {
+            const checkedRadio = document.querySelector(`input[name="custom_${field.id}"]:checked`);
+            const value = checkedRadio ? checkedRadio.value : '';
+            return { id: field.id, value };
+          } else if (field.type === 'MULTIPLE_OPTIONS' || field.type === 'CHECKBOX') {
+            const checkboxes = document.querySelectorAll(`input[name="custom_${field.id}"]:checked`);
+            const selectedOptions = Array.from(checkboxes).map(cb => cb.value);
+            return { id: field.id, value: selectedOptions };
+          } else {
+            const value = document.getElementById(`custom_${field.id}`)?.value || '';
+            return { id: field.id, value };
+          }
+        }));
+        data.customField = data.customField.filter(cf => cf.value !== '' && cf.value.length !== 0);
+      }
+
+      const url = selectedContactId
+        ? `https://rest.gohighlevel.com/v1/contacts/${selectedContactId}?locationId=${locationId}`
+        : `https://rest.gohighlevel.com/v1/contacts?locationId=${locationId}`;
+      try {
+        const response = await fetch(url, {
+          method: selectedContactId ? 'PUT' : 'POST',
+          headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        console.log('Save Contact Response:', await response.json());
+        alert(selectedContactId ? 'Contact updated successfully!' : 'Contact created successfully!');
+        closeForm();
+        loadContacts();
+      } catch (error) {
+        console.error('Error saving contact:', error);
+        alert('Error saving contact. Please try again.');
+      }
     });
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    console.log('Save Contact Response:', await response.json());
-    alert(selectedContactId ? 'Contact updated successfully!' : 'Contact created successfully!');
-    closeForm();
-    loadContacts();
-  } catch (error) {
-    console.error('Error saving contact:', error);
-    alert('Error saving contact. Please try again.');
-  }
-});
 
     async function changeToCustomer(contactId) {
       selectedContactId = contactId;
