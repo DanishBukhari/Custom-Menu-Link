@@ -70,7 +70,7 @@
     .bg-gold { background-color: #91712e; }
     .text-gold { color: #d0a547; }
     .bg-dark-green { background-color: #d0a547; }
-    .text-dark-green { color: #ffffff; }
+    .text-dark-green { color: #304528; }
     .sidebar {
       width: 250px;
       background-color: #304528;
@@ -105,7 +105,7 @@
   <div id="modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
     <div class="modal-content">
       <div class="sidebar">
-        <h3 class="text-2xl font-semibold text-dark-green mb-4">Categories</h3>
+        <h3 class="text-2xl font-semibold text-white mb-4">Categories</h3>
         <ul>
           <li>
             <button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="toggleClients()">Clients</button>
@@ -122,18 +122,18 @@
       </div>
       <div class="main-content">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-2xl font-semibold text-dark-green">Network Contacts</h2>
+          <h2 class="text-2xl font-semibold text-white">Network Contacts</h2>
           <input type="text" id="search-input" placeholder="Search clients..." class="search-bar p-2 border border-gray-300 rounded-lg text-dark-green" oninput="searchContacts()">
         </div>
         <div id="contact-list" class="bg-gray-50 p-4 rounded-lg"></div>
-        <button id="new-contact-btn" class="button bg-gold text-dark-green px-4 py-2 rounded-lg mt-2 hover:bg-yellow-600" style="display: none;" onclick="showNewContactForm()">New Contact</button>
+        <button id="new-contact-btn" class="button bg-gold text-white px-4 py-2 rounded-lg mt-2 hover:bg-yellow-600" style="display: none;" onclick="showNewContactForm()">New Contact</button>
         <div id="contact-form" class="mt-4" style="display: none;">
-          <h3 id="form-title" class="text-xl font-semibold text-dark-green mb-4"></h3>
+          <h3 id="form-title" class="text-xl font-semibold text-white mb-4"></h3>
           <form id="contact-form-element">
             <div id="standard-fields" class="space-y-4"></div>
             <div id="custom-fields" class="space-y-4 mt-4"></div>
             <div id="niche-field" class="form-group" style="display: none;">
-              <label class="block text-dark-green font-medium mb-1">Client Niche:</label>
+              <label class="block text-white font-medium mb-1">Client Niche:</label>
               <input type="text" id="niche" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
             </div>
             <div class="form-actions flex space-x-2">
@@ -141,7 +141,7 @@
                 Save
                 <span id="form-loader" class="loader"></span>
               </button>
-              <button type="button" class="button bg-gray-300 text-dark-green px-6 py-2 rounded-lg hover:bg-gray-400" onclick="closeForm()">Cancel</button>
+              <button type="button" class="button bg-gray-300 text-white px-6 py-2 rounded-lg hover:bg-gray-400" onclick="closeForm()">Cancel</button>
             </div>
           </form>
         </div>
@@ -189,13 +189,13 @@
       document.getElementById('niche-field').style.display = category !== 'clients' ? 'block' : 'none';
       document.getElementById('new-contact-btn').style.display = category === 'clients' && activeSubcategory === 'leads' ? 'block' : 'none';
       document.querySelectorAll('.sidebar button').forEach(btn => {
-        btn.classList.remove('bg-gold', 'text-dark-green');
+        btn.classList.remove('bg-gold', 'text-white');
         btn.classList.add('bg-dark-green', 'text-white');
       });
       const activeBtn = document.querySelector(`.sidebar button[onclick="setCategory('${category}')"]`);
       if (activeBtn) {
         activeBtn.classList.remove('bg-dark-green', 'text-white');
-        activeBtn.classList.add('bg-gold', 'text-dark-green');
+        activeBtn.classList.add('bg-gold', 'text-white');
       }
       if (category === 'clients') {
         setSubcategory(activeSubcategory || 'leads');
@@ -210,13 +210,13 @@
       activeSubcategory = subcategory;
       document.getElementById('new-contact-btn').style.display = subcategory === 'leads' ? 'block' : 'none';
       document.querySelectorAll('#subcategory-list button').forEach(btn => {
-        btn.classList.remove('bg-gold', 'text-dark-green');
+        btn.classList.remove('bg-gold', 'text-white');
         btn.classList.add('bg-dark-green', 'text-white');
       });
       const activeBtn = document.querySelector(`#subcategory-list button[onclick="setSubcategory('${subcategory}')"]`);
       if (activeBtn) {
         activeBtn.classList.remove('bg-dark-green', 'text-white');
-        activeBtn.classList.add('bg-gold', 'text-dark-green');
+        activeBtn.classList.add('bg-gold', 'text-white');
       }
       loadContacts();
     }
@@ -251,7 +251,7 @@
         li.innerHTML = `
           <span class="text-dark-green">${firstName} ${lastName}</span>
           <div class="space-x-2">
-            <button class="button bg-gold text-dark-green px-3 py-1 rounded-lg hover:bg-yellow-600" onclick="loadContact('${contactId}')">View</button>
+            <button class="button bg-gold text-white px-3 py-1 rounded-lg hover:bg-yellow-600" onclick="loadContact('${contactId}')">View</button>
             <button class="button bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600" onclick="deleteContact('${contactId}')">Delete</button>
             <button class="button bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600" onclick="addNote('${contactId}')">Add Note</button>
             ${activeCategory === 'clients' && activeSubcategory === 'leads' ? `<button class="button bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600" onclick="changeToCustomer('${contactId}')">Change to Customer</button>` : ''}
@@ -327,7 +327,7 @@
 
         document.getElementById('standard-fields').innerHTML = standardFields.map(field => `
           <div class="form-group">
-            <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+            <label class="block text-white font-medium mb-1">${field.label}:</label>
             <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
           </div>
         `).join('');
@@ -361,7 +361,7 @@
             if (field.type === 'FILE_UPLOAD') {
               return `
                 <div class="form-group">
-                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <label class="block text-white font-medium mb-1">${field.label}:</label>
                   <p class="file-preview mb-2">${fieldValue ? `<a href="${fieldValue}" target="_blank" class="text-gold hover:underline">${fieldValue.split('/').pop()}</a>` : 'No file uploaded'}</p>
                   <input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">
                 </div>
@@ -369,14 +369,14 @@
             } else if (field.type === 'LARGE_TEXT') {
               return `
                 <div class="form-group">
-                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <label class="block text-white font-medium mb-1">${field.label}:</label>
                   <textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">${fieldValue}</textarea>
                 </div>
               `;
             } else if (field.type === 'SINGLE_OPTIONS') {
               return `
                 <div class="form-group">
-                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <label class="block text-white font-medium mb-1">${field.label}:</label>
                   <select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                     <option value="">Select an option</option>
                     ${field.options.map(option => `<option value="${option}" ${fieldValue === option ? 'selected' : ''}>${option}</option>`).join('')}
@@ -386,7 +386,7 @@
             } else if (field.type === 'RADIO') {
               return `
                 <div class="form-group">
-                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <label class="block text-white font-medium mb-1">${field.label}:</label>
                   ${field.options.map(option => `
                     <label class="inline-flex items-center mr-4">
                       <input type="radio" name="custom_${field.id}" value="${option}" ${fieldValue === option ? 'checked' : ''} class="mr-2">
@@ -398,7 +398,7 @@
             } else if (field.type === 'MULTIPLE_OPTIONS') {
               return `
                 <div class="form-group">
-                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <label class="block text-white font-medium mb-1">${field.label}:</label>
                   ${field.options.map(option => `
                     <label class="inline-flex items-center mr-4 mb-2">
                       <input type="checkbox" name="custom_${field.id}" value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'checked' : ''} class="mr-2">
@@ -410,7 +410,7 @@
             } else if (field.type === 'CHECKBOX') {
               return `
                 <div class="form-group">
-                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <label class="block text-white font-medium mb-1">${field.label}:</label>
                   ${field.options.map(option => `
                     <label class="inline-flex items-center mr-4 mb-2">
                       <input type="checkbox" name="custom_${field.id}" value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'checked' : ''} class="mr-2">
@@ -422,21 +422,21 @@
             } else if (field.type === 'DATE') {
               return `
                 <div class="form-group">
-                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <label class="block text-white font-medium mb-1">${field.label}:</label>
                   <input type="date" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                 </div>
               `;
             } else if (field.type === 'PHONE') {
               return `
                 <div class="form-group">
-                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <label class="block text-white font-medium mb-1">${field.label}:</label>
                   <input type="tel" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                 </div>
               `;
             } else {
               return `
                 <div class="form-group">
-                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <label class="block text-white font-medium mb-1">${field.label}:</label>
                   <input type="text" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                 </div>
               `;
@@ -445,7 +445,7 @@
         } else if (activeCategory !== 'clients') {
           customFieldsDiv.innerHTML = `
             <div class="form-group">
-              <label class="block text-dark-green font-medium mb-1">Client Niche:</label>
+              <label class="block text-white font-medium mb-1">Client Niche:</label>
               <input type="text" id="custom_niche" value="${contact.customField?.find(cf => cf.id === 'niche')?.value || ''}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
             </div>
           `;
@@ -472,7 +472,7 @@
 
       document.getElementById('standard-fields').innerHTML = standardFields.map(field => `
         <div class="form-group">
-          <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+          <label class="block text-white font-medium mb-1">${field.label}:</label>
           <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
         </div>
       `).join('');
@@ -481,7 +481,7 @@
       if (activeCategory === 'clients' && activeSubcategory === 'customers') {
         customFieldsDiv.innerHTML = customerCustomFields.map(field => `
           <div class="form-group">
-            <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+            <label class="block text-white font-medium mb-1">${field.label}:</label>
             ${field.type === 'FILE_UPLOAD' ? 
               `<input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">` :
             field.type === 'LARGE_TEXT' ? 
@@ -515,7 +515,7 @@
       } else if (activeCategory !== 'clients') {
         customFieldsDiv.innerHTML = `
           <div class="form-group">
-            <label class="block text-dark-green font-medium mb-1">Client Niche:</label>
+            <label class="block text-white font-medium mb-1">Client Niche:</label>
             <input type="text" id="custom_niche" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
           </div>
         `;
