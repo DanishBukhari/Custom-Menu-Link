@@ -62,10 +62,6 @@
           <form id="contact-form-element">
             <div id="standard-fields" class="space-y-4"></div>
             <div id="custom-fields" class="space-y-4 mt-4"></div>
-            <div id="niche-field" class="form-group" style="display: none;">
-              <!-- <label class="block text-dark-green font-medium mb-1">Client Niche:</label>
-              <input type="text" id="custom_niche" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold"> -->
-            </div>
             <div class="form-actions flex space-x-2">
               <button type="submit" class="button bg-dark-green text-white px-6 py-2 rounded-lg hover:bg-green-800 flex items-center">
                 Save
@@ -199,8 +195,7 @@
       activeCategory = category;
       allContacts = [];
       document.getElementById('subcategory-list').classList.toggle('hidden', category !== 'clients');
-      document.getElementById('niche-field').style.display = category !== 'clients' ? 'block' : 'none';
-      document.getElementById('new-contact-btn').style.display = category === 'clients' && activeSubcategory === 'leads' ? 'block' : 'none';
+      document.getElementById('new-contact-btn').style.display = 'block'; // Show New Contact for all categories
       document.querySelectorAll('.sidebar button').forEach(btn => {
         btn.classList.remove('bg-gold', 'text-white');
         btn.classList.add('bg-dark-green', 'text-white');
@@ -221,7 +216,7 @@
       if (activeCategory !== 'clients') return;
       closeForm();
       activeSubcategory = subcategory;
-      document.getElementById('new-contact-btn').style.display = subcategory === 'leads' ? 'block' : 'none';
+      document.getElementById('new-contact-btn').style.display = 'block'; // Show New Contact for subcategories
       document.querySelectorAll('#subcategory-list button').forEach(btn => {
         btn.classList.remove('bg-gold', 'text-white');
         btn.classList.add('subcategory-button');
@@ -550,15 +545,16 @@
         customFields: []
       };
 
-      // Handle file uploads first
+      // Handle file uploads for multiple files
       const fileUploadPromises = customerCustomFields
         .filter(field => field.type === 'FILE_UPLOAD')
         .map(async field => {
           const fileInput = document.getElementById(`custom_${field.id}_new`);
-          if (fileInput && fileInput.files.length > 0) {
+          if (fileInput && fileInput.files && fileInput.files.length > 0) {
+            const uploadedFiles = [];
             for (const file of fileInput.files) {
               const formData = new FormData();
-              formData.append('file', file, file.name);
+              formData.append('file', file);
               formData.append('contactId', selectedContactId || '');
               formData.append('fieldId', field.id);
               formData.append('locationId', locationId);
@@ -571,9 +567,14 @@
                   const errorData = await response.json();
                   throw new Error(`Upload failed: ${errorData.error || response.statusText}`);
                 }
+                const result = await response.json();
+                uploadedFiles.push(result.url); // Store the URL from backend response
               } catch (error) {
-                console.error('File upload error:', error.message);
+                console.error(`Error uploading file ${file.name} for ${field.label}:`, error.message);
               }
+            }
+            if (uploadedFiles.length > 0) {
+              data.customFields.push({ id: field.id, value: uploadedFiles.length > 1 ? uploadedFiles : uploadedFiles[0] });
             }
           }
         });
@@ -582,34 +583,35 @@
 
       // Handle other custom fields
       const otherCustomFields = customerCustomFields.filter(field => field.type !== 'FILE_UPLOAD');
-      data.customFields = otherCustomFields.map(field => {
+      otherCustomFields.forEach(field => {
+        let value;
         if (field.type === 'SINGLE_OPTIONS') {
           const selectElement = document.getElementById(`custom_${field.id}`);
-          const value = selectElement ? selectElement.value : '';
-          return { id: field.id, value };
+          value = selectElement ? selectElement.value : '';
         } else if (field.type === 'RADIO') {
           const checkedRadio = document.querySelector(`input[name="custom_${field.id}"]:checked`);
-          const value = checkedRadio ? checkedRadio.value : '';
-          return { id: field.id, value };
+          value = checkedRadio ? checkedRadio.value : '';
         } else if (field.type === 'MULTIPLE_OPTIONS' || field.type === 'CHECKBOX') {
           const checkboxes = document.querySelectorAll(`input[name="custom_${field.id}"]:checked`);
-          const selectedOptions = Array.from(checkboxes).map(cb => cb.value);
-          return { id: field.id, value: selectedOptions };
+          value = Array.from(checkboxes).map(cb => cb.value);
         } else {
-          const value = document.getElementById(`custom-d ${field.id}`)?.value || '';
-          return { id: field.id, value };
+          value = document.getElementById(`custom_${field.id}`)?.value || '';
+        }
+        if (value && (typeof value === 'string' || (Array.isArray(value) && value.length > 0))) {
+          data.customFields.push({ id: field.id, value });
         }
       });
 
-      // Handle clientNiche for non-client categories
+      // Handle Client Niche for non-client categories
       if (activeCategory !== 'clients') {
-        const nicheValue = document.getElementById('custom_niche').value;
+        const nicheValue = document.getElementById('custom_niche')?.value || '';
         if (nicheValue) {
           data.customFields.push({ id: 'PjQ2rir2JEogi9aUAP2s', value: nicheValue });
         }
       }
 
-      data.customFields = data.customFields.filter(cf => cf.value !== '' && cf.value.length !== 0);
+      // Filter out empty custom fields
+      data.customFields = data.customFields.filter(cf => cf.value !== '' && (Array.isArray(cf.value) ? cf.value.length > 0 : true));
 
       const url = selectedContactId
         ? `https://rest.gohighlevel.com/v1/contacts/${selectedContactId}?locationId=${locationId}`
@@ -620,7 +622,10 @@
           headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
+        }
         console.log('Save Contact Response:', await response.json());
         alert(selectedContactId ? 'Contact updated successfully!' : 'Contact created successfully!');
         closeForm();
