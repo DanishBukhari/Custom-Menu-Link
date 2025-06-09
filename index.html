@@ -12,6 +12,10 @@
     .modal-content {
       transform: translateY(-20px);
       transition: transform 0.3s ease-in-out;
+      width: 90%;
+      max-width: 1200px;
+      height: 90vh;
+      max-height: 90vh;
     }
     .modal-open .modal-content {
       transform: translateY(0);
@@ -24,6 +28,8 @@
     }
     .form-group input, .form-group textarea, .form-group select {
       transition: border-color 0.3s ease;
+      font-size: 1.1rem;
+      padding: 0.75rem;
     }
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
       border-color: #3b82f6;
@@ -31,45 +37,90 @@
     }
     .form-actions {
       position: sticky;
-      bottom: -5%;
+      bottom: 0;
       background-color: white;
       padding: 1.5rem;
       border-top: 1px solid #e5e7eb;
       z-index: 10;
     }
+    .loader {
+      display: none;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin-left: 1rem;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .bg-gold {
+      background-color: #d0a547;
+    }
+    .text-gold {
+      color: #d0a547;
+    }
+    .bg-dark-green {
+      background-color: #304528;
+    }
+    .text-dark-green {
+      color: #304528;
+    }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
   <div id="network-app" class="w-full max-w-7xl p-4">
-    <button class="button bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700" onclick="openModal()">Network</button>
+    <button class="button bg-dark-green text-white px-6 py-3 rounded-lg shadow-lg hover:bg-green-800" onclick="openModal()">Network</button>
 
     <div class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" id="modal" style="display: none;">
-      <div class="modal-content bg-white rounded-lg shadow-2xl w-11/12 max-w-4xl p-6 max-h-[80vh] overflow-y-auto">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-2xl font-semibold text-gray-800">Network Contacts</h2>
-          <span class="close text-3xl text-gray-500 cursor-pointer hover:text-gray-700" onclick="closeModal()">×</span>
-        </div>
-        <div id="category-buttons" class="flex space-x-2 mb-4">
-          <button class="button bg-blue-500 text-white px-4 py-2 rounded-lg active:bg-blue-700" onclick="setCategory('clients')">Clients</button>
-          <button class="button bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400" onclick="setCategory('real estate')">Real Estate</button>
-          <button class="button bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400" onclick="setCategory('tradies')">Tradies</button>
-        </div>
-        <div id="subcategory-buttons" class="flex space-x-2 mb-4" style="display: none;">
-          <button class="button bg-blue-500 text-white px-4 py-2 rounded-lg active:bg-blue-700" onclick="setSubcategory('leads')">Leads</button>
-          <button class="button bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400" onclick="setSubcategory('customers')">Customers</button>
-        </div>
-        <div id="contact-list" class="bg-gray-50 p-4 rounded-lg"></div>
-        <button id="new-contact-btn" class="button bg-green-500 text-white px-4 py-2 rounded-lg mt-2 hover:bg-green-600" style="display: none;" onclick="showNewContactForm()">New Contact</button>
-        <div id="contact-form" class="mt-4" style="display: none;">
-          <h3 id="form-title" class="text-xl font-semibold text-gray-800 mb-4"></h3>
-          <form id="contact-form-element">
-            <div id="standard-fields" class="space-y-4"></div>
-            <div id="custom-fields" class="space-y-4 mt-4"></div>
-            <div class="form-actions flex space-x-2">
-              <button type="submit" class="button bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Save</button>
-              <button type="button" class="button bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400" onclick="closeForm()">Cancel</button>
+      <div class="modal-content bg-white rounded-lg shadow-2xl p-6 overflow-y-auto">
+        <div class="flex">
+          <div class="w-1/4 bg-gray-200 p-4">
+            <h3 class="text-lg font-semibold mb-4 text-dark-green">Categories</h3>
+            <ul>
+              <li class="mb-2">
+                <button class="w-full text-left text-dark-green hover:text-gold" onclick="toggleClients()">Clients</button>
+                <ul id="clients-dropdown" class="hidden ml-4">
+                  <li><button class="text-dark-green hover:text-gold" onclick="setSubcategory('leads')">Leads</button></li>
+                  <li><button class="text-dark-green hover:text-gold" onclick="setSubcategory('customers')">Customers</button></li>
+                </ul>
+              </li>
+              <li class="mb-2"><button class="text-dark-green hover:text-gold" onclick="setCategory('real estate')">Real Estate</button></li>
+              <li class="mb-2"><button class="text-dark-green hover:text-gold" onclick="setCategory('lawyers')">Lawyers</button></li>
+              <li class="mb-2"><button class="text-dark-green hover:text-gold" onclick="setCategory('tradies')">Tradies</button></li>
+              <li class="mb-2"><button class="text-dark-green hover:text-gold" onclick="setCategory('finance')">Finance</button></li>
+            </ul>
+          </div>
+          <div class="w-3/4 p-4">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-2xl font-semibold text-dark-green">Network Contacts</h2>
+              <input type="text" id="search-input" placeholder="Search clients..." class="p-2 border border-gray-300 rounded-lg text-dark-green" oninput="searchContacts()">
             </div>
-          </form>
+            <div id="contact-list" class="bg-gray-50 p-4 rounded-lg"></div>
+            <button id="new-contact-btn" class="button bg-gold text-dark-green px-4 py-2 rounded-lg mt-2 hover:bg-yellow-600" style="display: none;" onclick="showNewContactForm()">New Contact</button>
+            <div id="contact-form" class="mt-4" style="display: none;">
+              <h3 id="form-title" class="text-xl font-semibold text-dark-green mb-4"></h3>
+              <form id="contact-form-element">
+                <div id="standard-fields" class="space-y-4"></div>
+                <div id="custom-fields" class="space-y-4 mt-4"></div>
+                <div id="niche-field" class="form-group" style="display: none;">
+                  <label class="block text-dark-green font-medium mb-1">Client Niche:</label>
+                  <input type="text" id="client-niche" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
+                </div>
+                <div class="form-group">
+                  <label class="block text-dark-green font-medium mb-1">Notes:</label>
+                  <textarea id="notes" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold"></textarea>
+                </div>
+                <div class="form-actions flex space-x-2">
+                  <button type="submit" class="button bg-dark-green text-white px-6 py-2 rounded-lg hover:bg-green-800">Save</button>
+                  <button type="button" class="button bg-gray-300 text-dark-green px-6 py-2 rounded-lg hover:bg-gray-400" onclick="closeForm()">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -81,6 +132,7 @@
     let activeCategory = 'clients';
     let activeSubcategory = 'leads';
     let selectedContactId = null;
+    let allContacts = [];
 
     const customerCustomFields = [
       { label: 'Full Name', id: 'EXjXnQEL140VE4XYhaSX', type: 'TEXT' },
@@ -190,16 +242,22 @@
       document.getElementById('contact-form').style.display = 'none'; 
     }
 
+    function toggleClients() {
+      const dropdown = document.getElementById('clients-dropdown');
+      dropdown.classList.toggle('hidden');
+    }
+
     function setCategory(category) {
       closeForm();
       activeCategory = category;
-      document.getElementById('subcategory-buttons').style.display = category === 'clients' ? 'flex' : 'none';
-      setSubcategory(category === 'clients' ? 'leads' : '');
-      document.querySelectorAll('#category-buttons .button').forEach(btn => {
-        btn.classList.remove('bg-blue-500', 'text-white', 'active:bg-blue-700');
-        btn.classList.add('bg-gray-300', 'text-gray-700', 'hover:bg-gray-400');
-      });
-      document.querySelector(`#category-buttons .button[onclick="setCategory('${category}')"]`).classList.add('bg-blue-500', 'text-white', 'active:bg-blue-700');
+      if (category !== 'clients') {
+        document.getElementById('niche-field').style.display = 'block';
+        document.getElementById('contact-list').innerHTML = '';
+        document.getElementById('new-contact-btn').style.display = 'none';
+      } else {
+        document.getElementById('niche-field').style.display = 'none';
+        setSubcategory('leads');
+      }
     }
 
     function setSubcategory(subcategory) {
@@ -208,13 +266,6 @@
       activeSubcategory = subcategory;
       loadContacts();
       document.getElementById('new-contact-btn').style.display = subcategory === 'leads' ? 'block' : 'none';
-      document.querySelectorAll('#subcategory-buttons .button').forEach(btn => {
-        btn.classList.remove('bg-blue-500', 'text-white', 'active:bg-blue-700');
-        btn.classList.add('bg-gray-300', 'text-gray-700', 'hover:bg-gray-400');
-      });
-      if (subcategory) {
-        document.querySelector(`#subcategory-buttons .button[onclick="setSubcategory('${subcategory}')"]`).classList.add('bg-blue-500', 'text-white', 'active:bg-blue-700');
-      }
     }
 
     async function loadContacts() {
@@ -229,28 +280,57 @@
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
         const contacts = data.contacts || (data.contact ? [data.contact] : []);
-        const filteredContacts = contacts.filter(contact => (contact.tags || []).includes(tag));
-
-        const list = document.getElementById('contact-list');
-        list.innerHTML = filteredContacts.length === 0 ? '<p class="text-gray-600 text-center py-4">No contacts found.</p>' : '';
-        filteredContacts.forEach(contact => {
-          const firstName = contact.firstName || 'Unknown';
-          const lastName = contact.lastName || '';
-          const contactId = contact.id;
-          const li = document.createElement('li');
-          li.className = 'flex justify-between items-center p-3 border-b border-gray-200 hover:bg-gray-100';
-          li.innerHTML = `
-            <span class="text-gray-800">${firstName} ${lastName}</span>
-            <div class="space-x-2">
-              <button class="button bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600" onclick="loadContact('${contactId}')">View</button>
-              ${activeSubcategory === 'leads' ? `<button class="button bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600" onclick="changeToCustomer('${contactId}')">Change to Customer</button>` : ''}
-            </div>
-          `;
-          list.appendChild(li);
-        });
+        allContacts = contacts.filter(contact => (contact.tags || []).includes(tag));
+        displayContacts(allContacts);
       } catch (error) {
         console.error('Error loading contacts:', error);
         document.getElementById('contact-list').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contacts.</p>';
+      }
+    }
+
+    function displayContacts(contacts) {
+      const list = document.getElementById('contact-list');
+      list.innerHTML = contacts.length === 0 ? '<p class="text-gray-600 text-center py-4">No contacts found.</p>' : '';
+      contacts.forEach(contact => {
+        const firstName = contact.firstName || 'Unknown';
+        const lastName = contact.lastName || '';
+        const contactId = contact.id;
+        const li = document.createElement('li');
+        li.className = 'flex justify-between items-center p-3 border-b border-gray-200 hover:bg-gray-100';
+        li.innerHTML = `
+          <span class="text-dark-green">${firstName} ${lastName}</span>
+          <div class="space-x-2">
+            <button class="button bg-dark-green text-white px-3 py-1 rounded-lg hover:bg-green-800" onclick="loadContact('${contactId}')">View</button>
+            <button class="button bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600" onclick="deleteContact('${contactId}')">Delete</button>
+            ${activeSubcategory === 'leads' ? `<button class="button bg-gold text-dark-green px-3 py-1 rounded-lg hover:bg-yellow-600" onclick="changeToCustomer('${contactId}')">Change to Customer</button>` : ''}
+          </div>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function searchContacts() {
+      const searchTerm = document.getElementById('search-input').value.toLowerCase();
+      const filteredContacts = allContacts.filter(contact => 
+        `${contact.firstName || ''} ${contact.lastName || ''}`.toLowerCase().includes(searchTerm)
+      );
+      displayContacts(filteredContacts);
+    }
+
+    async function deleteContact(contactId) {
+      if (!confirm('Are you sure you want to delete this contact?')) return;
+      try {
+        const url = `https://rest.gohighlevel.com/v1/contacts/${contactId}?locationId=${locationId}`;
+        const response = await fetch(url, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${apiKey}` },
+        });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        alert('Contact deleted successfully!');
+        loadContacts();
+      } catch (error) {
+        console.error('Error deleting contact:', error);
+        alert('Error deleting contact. Please try again.');
       }
     }
 
@@ -274,8 +354,8 @@
 
         document.getElementById('standard-fields').innerHTML = standardFields.map(field => `
           <div class="form-group">
-            <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-            <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+            <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+            <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
           </div>
         `).join('');
 
@@ -308,23 +388,23 @@
             if (field.type === 'FILE_UPLOAD') {
               return `
                 <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <p class="file-preview mb-2">${fieldValue ? `<a href="${fieldValue}" target="_blank" class="text-blue-500 hover:underline">${fieldValue.split('/').pop()}</a>` : 'No file uploaded'}</p>
+                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <p class="file-preview mb-2">${fieldValue ? `<a href="${fieldValue}" target="_blank" class="text-gold hover:underline">${fieldValue.split('/').pop()}</a>` : 'No file uploaded'}</p>
                   <input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">
                 </div>
               `;
             } else if (field.type === 'LARGE_TEXT') {
               return `
                 <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">${fieldValue}</textarea>
+                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">${fieldValue}</textarea>
                 </div>
               `;
             } else if (field.type === 'SINGLE_OPTIONS') {
               return `
                 <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                     <option value="">Select an option</option>
                     ${field.options.map(option => `<option value="${option}" ${fieldValue === option ? 'selected' : ''}>${option}</option>`).join('')}
                   </select>
@@ -333,11 +413,11 @@
             } else if (field.type === 'RADIO') {
               return `
                 <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
                   ${field.options.map(option => `
                     <label class="inline-flex items-center mr-4">
                       <input type="radio" name="custom_${field.id}" value="${option}" ${fieldValue === option ? 'checked' : ''} class="mr-2">
-                      <span>${option}</span>
+                      <span class="text-dark-green">${option}</span>
                     </label>
                   `).join('')}
                 </div>
@@ -345,11 +425,11 @@
             } else if (field.type === 'MULTIPLE_OPTIONS') {
               return `
                 <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
                   ${field.options.map(option => `
                     <label class="inline-flex items-center mr-4 mb-2">
                       <input type="checkbox" name="custom_${field.id}" value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'checked' : ''} class="mr-2">
-                      <span>${option}</span>
+                      <span class="text-dark-green">${option}</span>
                     </label>
                   `).join('')}
                 </div>
@@ -357,11 +437,11 @@
             } else if (field.type === 'CHECKBOX') {
               return `
                 <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
                   ${field.options.map(option => `
                     <label class="inline-flex items-center mr-4 mb-2">
                       <input type="checkbox" name="custom_${field.id}" value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'checked' : ''} class="mr-2">
-                      <span>${option}</span>
+                      <span class="text-dark-green">${option}</span>
                     </label>
                   `).join('')}
                 </div>
@@ -369,30 +449,36 @@
             } else if (field.type === 'DATE') {
               return `
                 <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <input type="date" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <input type="date" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                 </div>
               `;
             } else if (field.type === 'PHONE') {
               return `
                 <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <input type="tel" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <input type="tel" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                 </div>
               `;
             } else {
               return `
                 <div class="form-group">
-                  <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-                  <input type="text" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <input type="text" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                 </div>
               `;
             }
           }).join('');
+        } else if (activeCategory !== 'clients') {
+          customFieldsDiv.innerHTML = '';
         } else {
           customFieldsDiv.innerHTML = '';
         }
 
+        document.getElementById('notes').value = contact.customField?.find(cf => cf.id === 'NvQGPZLuWhQ9yYXKp9ld')?.value || '';
+        if (activeCategory !== 'clients') {
+          document.getElementById('client-niche').value = contact.customField?.find(cf => cf.id === 'clientNiche')?.value || '';
+        }
         document.getElementById('form-title').textContent = 'Edit Contact';
         document.getElementById('contact-form').style.display = 'block';
       } catch (error) {
@@ -412,21 +498,22 @@
 
       document.getElementById('standard-fields').innerHTML = standardFields.map(field => `
         <div class="form-group">
-          <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
-          <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+          <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+          <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
         </div>
       `).join('');
 
-      document.getElementById('custom-fields').innerHTML = activeSubcategory === 'customers' ? 
-        customerCustomFields.map(field => `
+      const customFieldsDiv = document.getElementById('custom-fields');
+      if (activeSubcategory === 'customers') {
+        customFieldsDiv.innerHTML = customerCustomFields.map(field => `
           <div class="form-group">
-            <label class="block text-gray-700 font-medium mb-1">${field.label}:</label>
+            <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
             ${field.type === 'FILE_UPLOAD' ? 
               `<input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">` :
             field.type === 'LARGE_TEXT' ? 
-              `<textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500"></textarea>` :
+              `<textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold"></textarea>` :
             field.type === 'SINGLE_OPTIONS' ? 
-              `<select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">
+              `<select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                 <option value="">Select an option</option>
                 ${field.options.map(option => `<option value="${option}">${option}</option>`).join('')}
               </select>` :
@@ -434,23 +521,30 @@
               field.options.map(option => `
                 <label class="inline-flex items-center mr-4 mb-2">
                   <input type="radio" name="custom_${field.id}" value="${option}" class="mr-2">
-                  <span>${option}</span>
+                  <span class="text-dark-green">${option}</span>
                 </label>
               `).join('') :
             field.type === 'MULTIPLE_OPTIONS' || field.type === 'CHECKBOX' ? 
               field.options.map(option => `
                 <label class="inline-flex items-center mr-4 mb-2">
                   <input type="checkbox" name="custom_${field.id}" value="${option}" class="mr-2">
-                  <span>${option}</span>
+                  <span class="text-dark-green">${option}</span>
                 </label>
               `).join('') :
             field.type === 'DATE' ? 
-              `<input type="date" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">` :
+              `<input type="date" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">` :
             field.type === 'PHONE' ? 
-              `<input type="tel" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">` :
-              `<input type="text" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500">`}
+              `<input type="tel" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">` :
+              `<input type="text" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">`}
           </div>
-        `).join('') : '';
+        `).join('');
+      } else {
+        customFieldsDiv.innerHTML = '';
+      }
+      document.getElementById('notes').value = '';
+      if (activeCategory !== 'clients') {
+        document.getElementById('client-niche').value = '';
+      }
       document.getElementById('form-title').textContent = 'Create New Contact';
       document.getElementById('contact-form').style.display = 'block';
     }
@@ -463,17 +557,29 @@
         email: document.getElementById('email').value,
         phone: document.getElementById('phone').value,
         tags: [activeSubcategory === 'leads' ? 'new lead' : 'customer'],
+        customField: []
       };
+
+      const notes = document.getElementById('notes').value;
+      if (notes) {
+        data.customField.push({ id: 'NvQGPZLuWhQ9yYXKp9ld', value: notes });
+      }
+
+      if (activeCategory !== 'clients') {
+        const niche = document.getElementById('client-niche').value;
+        if (niche) {
+          data.customField.push({ id: 'clientNiche', value: niche }); // Assuming a custom field ID for niche
+        }
+      }
 
       const addressFields = ['xiMyfob6XvYdCJ2mUFvs', 'city', 'country', 'state', 'postalCode'];
       if (activeSubcategory === 'customers' && addressFields.some(id => document.getElementById(`custom_${id}`))) {
         const address = addressFields.map(id => document.getElementById(`custom_${id}`)?.value || '').filter(v => v).join(', ');
-        data.customField = data.customField || [];
         data.customField.push({ id: 'xiMyfob6XvYdCJ2mUFvs', value: address || '' });
       }
 
       if (activeSubcategory === 'customers') {
-        data.customField = await Promise.all(customerCustomFields.map(async field => {
+        data.customField = data.customField.concat(await Promise.all(customerCustomFields.map(async field => {
           if (field.type === 'FILE_UPLOAD') {
             const fileInput = document.getElementById(`custom_${field.id}_new`);
             if (fileInput && fileInput.files.length > 0) {
@@ -493,7 +599,7 @@
                 if (result.url) {
                   const preview = fileInput.parentElement.querySelector('.file-preview');
                   if (preview) {
-                    preview.innerHTML = `<a href="${result.url}" target="_blank" class="text-blue-500 hover:underline">${result.url.split('/').pop()}</a>`;
+                    preview.innerHTML = `<a href="${result.url}" target="_blank" class="text-gold hover:underline">${result.url.split('/').pop()}</a>`;
                   }
                   return { id: field.id, value: result.url };
                 }
@@ -520,7 +626,7 @@
             const value = document.getElementById(`custom_${field.id}`)?.value || '';
             return { id: field.id, value };
           }
-        }));
+        })));
         data.customField = data.customField.filter(cf => cf.value !== '' && cf.value.length !== 0);
       }
 
