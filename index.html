@@ -6,99 +6,29 @@
   <title>Network Interface</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .modal {
-      transition: opacity 0.3s ease-in-out;
-      display: none;
-    }
-    .modal.show {
-      display: flex;
-    }
-    .modal-content {
-      transform: translateY(-20px);
-      transition: transform 0.3s ease-in-out;
-      width: 100vw;
-      height: 100vh;
-      max-width: none;
-      max-height: none;
-      padding: 0;
-      overflow: hidden;
-      display: flex;
-      background-color: #fff;
-      margin-top: 20px;
-    }
-    .modal-open .modal-content {
-      transform: translateY(0);
-    }
-    .button {
-      transition: background-color 0.3s ease, transform 0.1s ease;
-      color: white;
-    }
-    .button:hover {
-      transform: scale(1.05);
-    }
-    .form-group input, .form-group textarea, .form-group select {
-      transition: border-color 0.3s ease;
-      font-size: 16px;
-      padding: 12px;
-    }
-    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-      border-color: #d0a547;
-      outline: none;
-    }
-    .form-actions {
-      position: sticky;
-      bottom: 0;
-      background-color: #fff;
-      padding: 1.5rem;
-      border-top: 1px solid #e5e7eb;
-      z-index: 10;
-    }
-    .loader {
-      display: none;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      animation: spin 1s linear infinite;
-      margin-left: 1rem;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .bg-gold { background-color: #91712e; }
+    .modal { transition: opacity 0.3s ease-in-out; display: none; }
+    .modal.show { display: flex; }
+    .modal-content { transform: translateY(-20px); transition: transform 0.3s ease-in-out; width: 100vw; height: 100vh; max-width: none; max-height: none; padding: 0; overflow: hidden; display: flex; background-color: #fff; margin-top: 15px; }
+    .modal-open .modal-content { transform: translateY(0); }
+    .button { transition: background-color 0.3s ease, transform 0.1s ease; color: white; }
+    .button:hover { transform: scale(1.05); }
+    .form-group input, .form-group textarea, .form-group select { transition: border-color 0.3s ease; font-size: 16px; padding: 12px; }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #d0a547; outline: none; }
+    .form-actions { position: sticky; bottom: 0; background-color: #fff; padding: 1.5rem; border-top: 1px solid #e5e7eb; z-index: 10; }
+    .loader { display: none; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-left: 1rem; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .bg-gold { background-color: #d0a547; }
     .text-gold { color: #d0a547; }
-    .bg-dark-green { background-color: #d0a547; }
+    .bg-dark-green { background-color: #304528; }
     .text-dark-green { color: #304528; }
-    .sidebar {
-      width: 250px;
-      background-color: #304528;
-      padding: 20px;
-      border-right: 1px solid #e5e7eb;
-      overflow-y: hidden;
-    }
-    .main-content {
-      flex-grow: 1;
-      padding: 20px;
-      overflow-y: auto;
-    }
-    .sidebar ul li {
-      margin-bottom: 10px;
-    }
-    .sidebar ul li button {
-      width: 100%;
-      text-align: left;
-      padding: 10px;
-      border-radius: 4px;
-    }
-    .subcategory-list {
-      margin-left: 15px;
-      margin-top: 5px;
-    }
-    .search-bar {
-      width: 200px;
-    }
+    .sidebar { width: 250px; background-color: #304528; padding: 20px; border-right: 1px solid #e5e7eb; overflow-y: hidden; }
+    .main-content { flex-grow: 1; padding: 20px; overflow-y: auto; }
+    .sidebar ul li { margin-bottom: 10px; }
+    .sidebar ul li button { width: 100%; text-align: left; padding: 10px; border-radius: 4px; }
+    .subcategory-list { margin-left: 15px; margin-top: 5px; }
+    .search-bar { width: 200px; }
+    .subcategory-button { background-color: transparent; color: white; padding: 8px 12px; border-radius: 4px; margin-top: 5px; }
+    .subcategory-button:hover { color: #d0a547; }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center" onload="openModal()">
@@ -108,14 +38,14 @@
         <h3 class="text-2xl font-semibold text-white mb-4">Categories</h3>
         <ul>
           <li>
-            <button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="toggleClients()">Clients</button>
+            <button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('clients')">Clients</button>
             <ul id="subcategory-list" class="hidden">
-              <li><button class="bg-dark-green text-white button px-3 py-1 rounded-lg" onclick="setSubcategory('leads')">Leads</button></li>
-              <li><button class="bg-dark-green text-white button px-3 py-1 rounded-lg" onclick="setSubcategory('customers')">Customers</button></li>
+              <li><button class="subcategory-button" onclick="setSubcategory('leads')">Leads</button></li>
+              <li><button class="subcategory-button" onclick="setSubcategory('customers')">Customers</button></li>
             </ul>
           </li>
           <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('real estate')">Real Estate</button></li>
-          <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('lawyers')">Lawyers</button></li>
+          <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('Conveyance lawyers')">Lawyers</button></li>
           <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg button" onclick="setCategory('tradies')">Tradies</button></li>
           <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg" onclick="setCategory('finance')">Finance</button></li>
         </ul>
@@ -123,18 +53,18 @@
       <div class="main-content">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-semibold text-dark-green">Network Contacts</h2>
-          <input type="text" id="search-input" placeholder="Search clients..." class="search-bar p-2 border border-gray-300 rounded-lg text-dark-green" oninput="searchContacts()">
+          <input type="text" id="search-input" placeholder="Search clients..." class="search-bar p-2 border border-gray-300 rounded-lg text-white" oninput="searchContacts()">
         </div>
         <div id="contact-list" class="bg-gray-50 p-4 rounded-lg"></div>
-        <button id="new-contact-btn" class="button bg-gold text-white px-4 py-2 rounded-lg mt-2 hover:bg-yellow-600" style="display: none;" onclick="showNewContactForm()">New Contact</button>
+        <button id="new-contact-btn" class="button bg-gold text-white px-4 py-2 rounded-lg mt-2 hover:bg-yellow-600" style="display: none; background: #d0a547;" onclick="showNewContactForm()">New Contact</button>
         <div id="contact-form" class="mt-4" style="display: none;">
-          <h3 id="form-title" class="text-xl font-semibold text-white mb-4"></h3>
+          <h3 id="form-title" class="text-xl font-semibold mb-4"></h3>
           <form id="contact-form-element">
             <div id="standard-fields" class="space-y-4"></div>
             <div id="custom-fields" class="space-y-4 mt-4"></div>
             <div id="niche-field" class="form-group" style="display: none;">
-              <label class="block text-white font-medium mb-1">Client Niche:</label>
-              <input type="text" id="niche" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
+              <label class="block text-dark-green font-medium mb-1">Client Niche:</label>
+              <input type="text" id="custom_niche" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
             </div>
             <div class="form-actions flex space-x-2">
               <button type="submit" class="button bg-dark-green text-white px-6 py-2 rounded-lg hover:bg-green-800 flex items-center">
@@ -157,6 +87,97 @@
     let selectedContactId = null;
     let allContacts = [];
 
+    const customerCustomFields = [
+      { label: 'Full Name', id: 'EXjXnQEL140VE4XYhaSX', type: 'TEXT' },
+      { label: 'Address', id: 'xiMyfob6XvYdCJ2mUFvs', type: 'LARGE_TEXT' },
+      { label: 'Alternate Number', id: 'jvAsiZOUQaCGJIovm6ow', type: 'PHONE' },
+      { label: 'Citizenship Status', id: 'PEVvVcPisnmdY3qoYwyR', type: 'TEXT' },
+      { label: 'REIQ Checklist', id: 'rxOfHP9T8qdurVaokT2s', type: 'FILE_UPLOAD' },
+      { label: 'Notes', id: 'NvQGPZLuWhQ9yYXKp9ld', type: 'LARGE_TEXT' },
+      { label: 'Upload DL/Passport', id: 'HOhKJUkCUTScTWamVlZf', type: 'FILE_UPLOAD' },
+      { label: 'Alternate email', id: 'KZXiIduGXfQa4gcpSAHv', type: 'TEXT' },
+      { label: 'Preferred Method of Communication', id: 'grhYMh52GpDD8QuNuo0J', type: 'MULTIPLE_OPTIONS', options: ['Email', 'Phone', 'Text', 'In-Person'] },
+      { label: 'Type of Service', id: 'sHX29V5gxwBYO4WMTQHp', type: 'RADIO', options: ['Full Service Buyers Advocacy', 'Auction Bidding', 'Negotiation Only'] },
+      { label: 'Form 6 Sent?', id: 'PR7PRh4wuvF9yrMLhaZF', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Form 6 Executed', id: 'KQz5NQgoGq1l6sI8YPk6', type: 'CHECKBOX', options: ['Yes, Signed by all parties'] },
+      { label: 'Form 6 Sent to all parties', id: 'APFoTEdW0JHfH5uJIqUL', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Client Agreement Sent?', id: 'iPFysM90lheoQzV0FOBM', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Client Agreement Executed', id: '4sFw9DsvvygEWyyl2wOx', type: 'CHECKBOX', options: ['Yes, Agreement Signed'] },
+      { label: 'Client Agreement sent to all Parties', id: 'CL0w2AcSvCkjyo4L15ip', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Service Fee', id: 'FLP394K9sPjDT21C0Yda', type: 'TEXT' },
+      { label: 'Fee to be Paid', id: 'E6fHsabXPU5QkUd3f6wI', type: 'SINGLE_OPTIONS', options: ['Unconditional', 'Conditional', 'Not Applicable'] },
+      { label: 'Retainer including GST', id: 'qcWKnqkUOgM3X9bVCrbO', type: 'TEXT' },
+      { label: 'Retainer Invoice Paid', id: 'yGmz10g9dX8itDkh5Emo', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Referral Name', id: '6uIIMjIfV0XQ4jwn1ZXv', type: 'TEXT' },
+      { label: 'Referral Company', id: 'yb56Vm4w6pioj7Ry8xOi', type: 'TEXT' },
+      { label: 'Referral Phone', id: 'mhRM0JSI71O4bE6D9HnA', type: 'PHONE' },
+      { label: 'Referral Email', id: '7Yfw3ndm4LlMZWRt08l1', type: 'TEXT' },
+      { label: 'Referral Fee Paid?', id: '6AlnT4R8lKsHz12XIuht', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Mortgage Company', id: 'lOWvhGItK1DfcYdmEmr5', type: 'TEXT' },
+      { label: 'Name of the Broker', id: 'zF8zaixssgBPmrmaKFv7', type: 'TEXT' },
+      { label: 'Address (Mortgage Broker)', id: 'v6YC1hH9al2CAH2O1YQZ', type: 'LARGE_TEXT' },
+      { label: 'Phone (Mortgage Broker)', id: '4nfCxk7ACGXPJYOhZ98q', type: 'PHONE' },
+      { label: 'Email (Mortgage Broker)', id: 'S2AKVZq7g9sXm7Qnf4ad', type: 'TEXT' },
+      { label: 'Finance Approval', id: 'VDFuiC8FcBXn6A6g0eW9', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Date of Expiry', id: '2jj35L7SgYQVh22CjA4b', type: 'DATE' },
+      { label: 'Name of the Conveyancer', id: '0BgAiLdSVF9JxQ28qibZ', type: 'TEXT' },
+      { label: 'Company (Conveyancer)', id: 'tVcyZhEtB0G3ydzQB2vi', type: 'TEXT' },
+      { label: 'Address (Conveyancer)', id: '5MfJnwZsjSpGpJNGFqBj', type: 'LARGE_TEXT' },
+      { label: 'Phone (Conveyancer)', id: '5JEWkh4EfSQ1wEc0pfEq', type: 'PHONE' },
+      { label: 'Email (Conveyancer)', id: 'RbnDMwGZxcCw2TAhtXdf', type: 'TEXT' },
+      { label: 'Name of the Accountant', id: 'zLWuKlNFCy77I9Rh2JUg', type: 'TEXT' },
+      { label: 'Company (Accountant)', id: 'sc3jlus2FEvrZo6bkGGs', type: 'TEXT' },
+      { label: 'Address (Accountant)', id: '4O8RZbvD8yAt9jxsaL8f', type: 'LARGE_TEXT' },
+      { label: 'Phone (Accountant)', id: 'uj1nEbRZRfU61BEAXItg', type: 'PHONE' },
+      { label: 'Email (Accountant)', id: 'yJZJ5PlmZDaHKkz2hy3M', type: 'TEXT' },
+      { label: 'Name of the Financial Adviser', id: 'iE8WWJ9Ye7Z32To1KGoy', type: 'TEXT' },
+      { label: 'Company (Financial Adviser)', id: 'LRS2RQjK5qYL8fWyfxzs', type: 'TEXT' },
+      { label: 'Address (Financial Adviser)', id: 'YInzODdGmRDeWGvtA6kv', type: 'LARGE_TEXT' },
+      { label: 'Phone (Financial Adviser)', id: 'nnxNZEZSg6Nw1sysMzhh', type: 'PHONE' },
+      { label: 'Email (Financial Adviser)', id: 'p61NEhKJLIOyIz7qeqpb', type: 'TEXT' },
+      { label: 'Reason for Purchase', id: 'P1y8L9Xk1N9eRdQ2rKVr', type: 'MULTIPLE_OPTIONS', options: ['Owner Occupier', 'Investment', 'Holiday Home'] },
+      { label: 'Strategy Outcomes', id: 'gINIpN4sR404ahNgyPkX', type: 'MULTIPLE_OPTIONS', options: ['Renovation Potential', 'Subdivision Potential', 'Development Potential'] },
+      { label: 'Tenant', id: 'ti1qc7zG8ZVBfnkqm7Zd', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Areas/Locations', id: 'uAq6W9XWSaqTU9P5mSxr', type: 'LARGE_TEXT' },
+      { label: 'Building Type', id: 'jUJ7iCewuxlFttWfPLLu', type: 'LARGE_TEXT' },
+      { label: 'Land Size', id: 'fqANWu9PRJHBs0A0PVOe', type: 'LARGE_TEXT' },
+      { label: 'Budget', id: 'nLNN1njsqcMmImQXDZdU', type: 'LARGE_TEXT' },
+      { label: 'Time Frame', id: 'jkLvLtBIenZ66IHg0u8G', type: 'LARGE_TEXT' },
+      { label: 'Must Haves', id: 'AysRDNDmW7NEmgkxG0Pc', type: 'LARGE_TEXT' },
+      { label: 'Second Choice Must Haves', id: 'MHQP9pQgsvadprNyXCIy', type: 'LARGE_TEXT' },
+      { label: 'Previously Viewed Properties', id: 'XITF19lX0YYapZCBT23E', type: 'LARGE_TEXT' },
+      { label: 'Potential Properties', id: '2GkoU8Lh72AC5BwPSFzf', type: 'LARGE_TEXT' },
+      { label: 'Property Identified', id: 'raEuLUqKopdXzxvIreDU', type: 'LARGE_TEXT' },
+      { label: 'CMA Sent?', id: 'daYmzLY5IFA9g8n09ONs', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Flood', id: 'Lyv7eAn1tBgDzpToEgdf', type: 'FILE_UPLOAD', multiple: true },
+      { label: 'Bushfire', id: 'ccHSnDHKJFi7PZOtn9zt', type: 'FILE_UPLOAD', multiple: true },
+      { label: 'Heritage', id: 'JNxCzxrxifroeclObyRB', type: 'FILE_UPLOAD', multiple: true },
+      { label: 'Title Search', id: 'wapXPv1hnCYDpDK1vfTa', type: 'LARGE_TEXT' },
+      { label: 'Mortgage Broker Check Complete', id: 'zVVmbafhz3TZ1xfOK9yj', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Contract Sent to Solicitor', id: 'txxrIggN291g9OISLz3y', type: 'LARGE_TEXT' },
+      { label: 'Offer received by real estate agent', id: 'zVVmbafhz3TZ1xfOK9yj', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Full Name (Client 2)', id: 'wHB4bJhT9kuFPNAHMygP', type: 'TEXT' },
+      { label: 'Address (Client 2)', id: '634PeulkBMxDwi5Mw9tf', type: 'LARGE_TEXT' },
+      { label: 'Full Name (Client 3)', id: 'NcZ9Q0kt2Um0idKhmIhM', type: 'TEXT' },
+      { label: 'Phone (Client 2)', id: 'jEH869tIk7awVG3y7L62', type: 'PHONE' },
+      { label: 'Phone (Client 3)', id: '7Jde9fNNqL8K9XHCy7u5', type: 'PHONE' },
+      { label: 'Alternate Number (Client 2)', id: 'OSkhPsIb5CaLsfHFVVVl', type: 'PHONE' },
+      { label: 'Alternate Number (Client 3)', id: 'IKAkpbKPUQfPDGqml4U9', type: 'PHONE' },
+      { label: 'Email', id: 'rGl3o463R2k6pHA2sUTr', type: 'TEXT' },
+      { label: 'Alternate email (Client 2)', id: 'BrLRYmiETzuMOpZcJoAj', type: 'TEXT' },
+      { label: 'Alternate email (Client 3)', id: 'I0XR6vaXZl9bDrgbClFn', type: 'TEXT' },
+      { label: 'Notes (Client 2)', id: '6G3biDu17n4DTjb3bT4Y', type: 'LARGE_TEXT' },
+      { label: 'Notes (Client 3)', id: 'hH7IcmQZgEwHzIjFJB6j', type: 'LARGE_TEXT' },
+      { label: 'Upload DL/Passport (Client 2)', id: 'MjyKkWTESS8hNXmjVGwo', type: 'FILE_UPLOAD' },
+      { label: 'Upload DL/Passport (Client 3)', id: '2gwL1Xt4gpLXPvIq8l0X', type: 'FILE_UPLOAD' },
+      { label: 'Citizenship Status (Client 2)', id: '6Kkzjrfw2H9PnKbrHfxZ', type: 'TEXT' },
+      { label: 'Citizenship Status (Client 3)', id: 'sLy2EQaKQkHZvTvQc0OS', type: 'TEXT' },
+      { label: 'REIQ Checklist (Client 2)', id: 'OfCZ3qfSOkcjb8JXG7Nj', type: 'FILE_UPLOAD' },
+      { label: 'REIQ Checklist (Client 3)', id: '5QyH4ryvNdDopxkLa1pT', type: 'FILE_UPLOAD' },
+      { label: 'Address (Client 3)', id: '0TR2XsNuizgdI43JuI9X', type: 'LARGE_TEXT' },
+      { label: 'Email (Client 3)', id: 'zBRgbclelurPoN84ZqRX', type: 'TEXT' }
+    ];
+
     function openModal() {
       document.getElementById('modal').classList.add('show');
       setCategory('clients');
@@ -171,14 +192,6 @@
 
     function closeForm() {
       document.getElementById('contact-form').style.display = 'none';
-    }
-
-    function toggleClients() {
-      const dropdown = document.getElementById('subcategory-list');
-      dropdown.classList.toggle('hidden');
-      if (!dropdown.classList.contains('hidden')) {
-        setSubcategory('leads');
-      }
     }
 
     function setCategory(category) {
@@ -211,11 +224,11 @@
       document.getElementById('new-contact-btn').style.display = subcategory === 'leads' ? 'block' : 'none';
       document.querySelectorAll('#subcategory-list button').forEach(btn => {
         btn.classList.remove('bg-gold', 'text-white');
-        btn.classList.add('bg-dark-green', 'text-white');
+        btn.classList.add('subcategory-button');
       });
       const activeBtn = document.querySelector(`#subcategory-list button[onclick="setSubcategory('${subcategory}')"]`);
       if (activeBtn) {
-        activeBtn.classList.remove('bg-dark-green', 'text-white');
+        activeBtn.classList.remove('subcategory-button');
         activeBtn.classList.add('bg-gold', 'text-white');
       }
       loadContacts();
@@ -226,13 +239,12 @@
       const url = `https://rest.gohighlevel.com/v1/contacts?locationId=${locationId}&tags=${encodeURIComponent(tag)}`;
       try {
         document.getElementById('contact-list').innerHTML = '<p class="text-gray-600 text-center py-4">Loading contacts...</p>';
-        const response = await fetch(url, {
-          headers: { Authorization: `Bearer ${apiKey}` },
-        });
+        const response = await fetch(url, { headers: { Authorization: `Bearer ${apiKey}` } });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
         allContacts = data.contacts || (data.contact ? [data.contact] : []);
-        displayContacts(allContacts);
+        const filteredContacts = allContacts.filter(contact => contact.tags && contact.tags.includes(tag));
+        displayContacts(filteredContacts);
       } catch (error) {
         console.error('Error loading contacts:', error);
         document.getElementById('contact-list').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contacts.</p>';
@@ -254,7 +266,7 @@
             <button class="button bg-gold text-white px-3 py-1 rounded-lg hover:bg-yellow-600" onclick="loadContact('${contactId}')">View</button>
             <button class="button bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600" onclick="deleteContact('${contactId}')">Delete</button>
             <button class="button bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600" onclick="addNote('${contactId}')">Add Note</button>
-            ${activeCategory === 'clients' && activeSubcategory === 'leads' ? `<button class="button bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600" onclick="changeToCustomer('${contactId}')">Change to Customer</button>` : ''}
+            ${activeCategory === 'clients' && activeSubcategory === 'leads' ? `<button class="button text-white px-3 py-1 rounded-lg hover:bg-yellow-600 bg-gold" onclick="changeToCustomer('${contactId}')">Change to Customer</button>` : ''}
           </div>
         `;
         list.appendChild(li);
@@ -293,10 +305,7 @@
         const url = `https://rest.gohighlevel.com/v1/contacts/${contactId}/notes`;
         const response = await fetch(url, {
           method: 'POST',
-          headers: { 
-            'Authorization': `Bearer ${apiKey}`, 
-            'Content-Type': 'application/json' 
-          },
+          headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ body: note })
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -311,12 +320,11 @@
       selectedContactId = contactId;
       const url = `https://rest.gohighlevel.com/v1/contacts/${contactId}?locationId=${locationId}&include=customFields`;
       try {
-        const response = await fetch(url, {
-          headers: { Authorization: `Bearer ${apiKey}` },
-        });
+        const response = await fetch(url, { headers: { Authorization: `Bearer ${apiKey}` } });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
         const contact = data.contact || data;
+        console.log('Single Contact Response:', JSON.stringify(contact, null, 2));
 
         const standardFields = [
           { label: 'First Name', key: 'firstName', id: 'firstName', value: contact.firstName || '', required: true },
@@ -327,7 +335,7 @@
 
         document.getElementById('standard-fields').innerHTML = standardFields.map(field => `
           <div class="form-group">
-            <label class="block text-white font-medium mb-1">${field.label}:</label>
+            <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
             <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
           </div>
         `).join('');
@@ -336,8 +344,7 @@
         if (activeCategory === 'clients' && activeSubcategory === 'customers') {
           const customFieldValues = contact.customField || [];
           const fieldMap = customFieldValues.reduce((map, cf) => {
-            const value = cf.value && typeof cf.value === 'object' ? (cf.value[Object.keys(cf.value)[0]]?.url || cf.value) : cf.value;
-            map[cf.id] = value || '';
+            map[cf.id] = cf.value;
             return map;
           }, {});
 
@@ -359,24 +366,35 @@
             if (field.label === 'Address') fieldValue = addressValue;
 
             if (field.type === 'FILE_UPLOAD') {
+              let filePreviews = 'No file uploaded';
+              if (fieldValue && typeof fieldValue === 'object') {
+                const fileEntries = Object.entries(fieldValue);
+                if (fileEntries.length > 0) {
+                  filePreviews = fileEntries.map(([uuid, fileInfo]) => {
+                    const originalName = fileInfo.meta?.originalname || 'Unnamed File';
+                    const fileUrl = fileInfo.url || '#';
+                    return `<a href="${fileUrl}" target="_blank" class="text-gold hover:underline">${originalName}</a>`;
+                  }).join(', ');
+                }
+              }
               return `
                 <div class="form-group">
-                  <label class="block text-white font-medium mb-1">${field.label}:</label>
-                  <p class="file-preview mb-2">${fieldValue ? `<a href="${fieldValue}" target="_blank" class="text-gold hover:underline">${fieldValue.split('/').pop()}</a>` : 'No file uploaded'}</p>
-                  <input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">
+                  <label class="block text-dark-green font-medium mb-1">${field.label}:</label>
+                  <p class="file-preview mb-2">${filePreviews}</p>
+                  <input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg" ${field.multiple ? 'multiple' : ''}>
                 </div>
               `;
             } else if (field.type === 'LARGE_TEXT') {
               return `
                 <div class="form-group">
-                  <label class="block text-white font-medium mb-1">${field.label}:</label>
+                  <label class="block font-medium mb-1">${field.label}:</label>
                   <textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">${fieldValue}</textarea>
                 </div>
               `;
             } else if (field.type === 'SINGLE_OPTIONS') {
               return `
                 <div class="form-group">
-                  <label class="block text-white font-medium mb-1">${field.label}:</label>
+                  <label class="block font-medium mb-1">${field.label}:</label>
                   <select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                     <option value="">Select an option</option>
                     ${field.options.map(option => `<option value="${option}" ${fieldValue === option ? 'selected' : ''}>${option}</option>`).join('')}
@@ -386,7 +404,7 @@
             } else if (field.type === 'RADIO') {
               return `
                 <div class="form-group">
-                  <label class="block text-white font-medium mb-1">${field.label}:</label>
+                  <label class="block font-medium mb-1">${field.label}:</label>
                   ${field.options.map(option => `
                     <label class="inline-flex items-center mr-4">
                       <input type="radio" name="custom_${field.id}" value="${option}" ${fieldValue === option ? 'checked' : ''} class="mr-2">
@@ -395,22 +413,10 @@
                   `).join('')}
                 </div>
               `;
-            } else if (field.type === 'MULTIPLE_OPTIONS') {
+            } else if (field.type === 'MULTIPLE_OPTIONS' || field.type === 'CHECKBOX') {
               return `
                 <div class="form-group">
-                  <label class="block text-white font-medium mb-1">${field.label}:</label>
-                  ${field.options.map(option => `
-                    <label class="inline-flex items-center mr-4 mb-2">
-                      <input type="checkbox" name="custom_${field.id}" value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'checked' : ''} class="mr-2">
-                      <span>${option}</span>
-                    </label>
-                  `).join('')}
-                </div>
-              `;
-            } else if (field.type === 'CHECKBOX') {
-              return `
-                <div class="form-group">
-                  <label class="block text-white font-medium mb-1">${field.label}:</label>
+                  <label class="block font-medium mb-1">${field.label}:</label>
                   ${field.options.map(option => `
                     <label class="inline-flex items-center mr-4 mb-2">
                       <input type="checkbox" name="custom_${field.id}" value="${option}" ${Array.isArray(fieldValue) && fieldValue.includes(option) ? 'checked' : ''} class="mr-2">
@@ -422,33 +428,36 @@
             } else if (field.type === 'DATE') {
               return `
                 <div class="form-group">
-                  <label class="block text-white font-medium mb-1">${field.label}:</label>
+                  <label class="block font-medium mb-1">${field.label}:</label>
                   <input type="date" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                 </div>
               `;
             } else if (field.type === 'PHONE') {
               return `
                 <div class="form-group">
-                  <label class="block text-white font-medium mb-1">${field.label}:</label>
+                  <label class="block font-medium mb-1">${field.label}:</label>
                   <input type="tel" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                 </div>
               `;
             } else {
               return `
                 <div class="form-group">
-                  <label class="block text-white font-medium mb-1">${field.label}:</label>
+                  <label class="block font-medium mb-1">${field.label}:</label>
                   <input type="text" id="custom_${field.id}" value="${fieldValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                 </div>
               `;
             }
           }).join('');
+          console.log('Custom Field IDs:', customerCustomFields.map(field => field.id));
         } else if (activeCategory !== 'clients') {
+          const nicheValue = contact.customField?.find(cf => cf.id === 'PjQ2rir2JEogi9aUAP2s')?.value || '';
           customFieldsDiv.innerHTML = `
             <div class="form-group">
-              <label class="block text-white font-medium mb-1">Client Niche:</label>
-              <input type="text" id="custom_niche" value="${contact.customField?.find(cf => cf.id === 'niche')?.value || ''}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
+              <label class="block text-dark-green font-medium mb-1">Client Niche:</label>
+              <input type="text" id="custom_niche" value="${nicheValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
             </div>
           `;
+          console.log('Custom Field IDs:', ['PjQ2rir2JEogi9aUAP2s']);
         } else {
           customFieldsDiv.innerHTML = '';
         }
@@ -472,7 +481,7 @@
 
       document.getElementById('standard-fields').innerHTML = standardFields.map(field => `
         <div class="form-group">
-          <label class="block text-white font-medium mb-1">${field.label}:</label>
+          <label class="block font-medium mb-1">${field.label}:</label>
           <input type="${field.type || 'text'}" id="${field.id}" value="${field.value}" ${field.required ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
         </div>
       `).join('');
@@ -481,9 +490,9 @@
       if (activeCategory === 'clients' && activeSubcategory === 'customers') {
         customFieldsDiv.innerHTML = customerCustomFields.map(field => `
           <div class="form-group">
-            <label class="block text-white font-medium mb-1">${field.label}:</label>
+            <label class="block font-medium mb-1">${field.label}:</label>
             ${field.type === 'FILE_UPLOAD' ? 
-              `<input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg">` :
+              `<input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg" ${field.multiple ? 'multiple' : ''}>` :
             field.type === 'LARGE_TEXT' ? 
               `<textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold"></textarea>` :
             field.type === 'SINGLE_OPTIONS' ? 
@@ -512,13 +521,15 @@
               `<input type="text" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">`}
           </div>
         `).join('');
+        console.log('Custom Field IDs for new contact:', customerCustomFields.map(field => field.id));
       } else if (activeCategory !== 'clients') {
         customFieldsDiv.innerHTML = `
           <div class="form-group">
-            <label class="block text-white font-medium mb-1">Client Niche:</label>
+            <label class="block text-dark-green font-medium mb-1">Client Niche:</label>
             <input type="text" id="custom_niche" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
           </div>
         `;
+        console.log('Custom Field IDs for new contact:', ['PjQ2rir2JEogi9aUAP2s']);
       } else {
         customFieldsDiv.innerHTML = '';
       }
@@ -536,22 +547,18 @@
         email: document.getElementById('email').value,
         phone: document.getElementById('phone').value,
         tags: [activeCategory === 'clients' ? (activeSubcategory === 'leads' ? 'new lead' : 'customer') : activeCategory.toLowerCase()],
-        customField: []
+        customFields: []
       };
 
-      const addressFields = ['xiMyfob6XvYdCJ2mUFvs', 'city', 'country', 'state', 'postalCode'];
-      if (activeCategory === 'clients' && activeSubcategory === 'customers' && addressFields.some(id => document.getElementById(`custom_${id}`))) {
-        const address = addressFields.map(id => document.getElementById(`custom_${id}`)?.value || '').filter(v => v).join(', ');
-        data.customField.push({ id: 'xiMyfob6XvYdCJ2mUFvs', value: address || '' });
-      }
-
-      if (activeCategory === 'clients' && activeSubcategory === 'customers') {
-        data.customField = data.customField.concat(await Promise.all(customerCustomFields.map(async field => {
-          if (field.type === 'FILE_UPLOAD') {
-            const fileInput = document.getElementById(`custom_${field.id}_new`);
-            if (fileInput && fileInput.files.length > 0) {
+      // Handle file uploads first
+      const fileUploadPromises = customerCustomFields
+        .filter(field => field.type === 'FILE_UPLOAD')
+        .map(async field => {
+          const fileInput = document.getElementById(`custom_${field.id}_new`);
+          if (fileInput && fileInput.files.length > 0) {
+            for (const file of fileInput.files) {
               const formData = new FormData();
-              formData.append('file', fileInput.files[0], fileInput.files[0].name);
+              formData.append('file', file, file.name);
               formData.append('contactId', selectedContactId || '');
               formData.append('fieldId', field.id);
               formData.append('locationId', locationId);
@@ -564,45 +571,45 @@
                   const errorData = await response.json();
                   throw new Error(`Upload failed: ${errorData.error || response.statusText}`);
                 }
-                const result = await response.json(data);
-                if (result.url) {
-                  const preview = fileInput.parentElement.querySelector('.file-preview');
-                  if (preview) {
-                    preview.innerHTML = `<a href="${result.url}" target="_blank" class="text-gold hover:underline">${result.url.split('/').pop()}</a>`;
-                  }
-                  return { id: result.id, value: result.url };
-                }
-                throw new Error('Upload failed: No URL returned');
               } catch (error) {
                 console.error('File upload error:', error.message);
-                return { id: field.id, value: '' };
               }
             }
-            return { id: field.id, value: document.getElementById(`custom_${field.id}`)?.value || '' };
-          } else if (field.type === 'SINGLE_OPTIONS') {
-            const selectElement = document.getElementById(`custom_${field.id}`);
-            const value = selectElement ? selectElement.value : '';
-            return { id: field.id, value };
-          } else if (field.type === 'RADIO') {
-            const checkedRadio = document.querySelector(`input[name="custom_${field.id}"]:checked`);
-            const value = checkedRadio ? checkedRadio.value : '';
-            return { id: field.id, value };
-          } else if (field.type === 'MULTIPLE_OPTIONS' || field.type === 'CHECKBOX') {
-            const checkboxes = document.querySelectorAll(`input[name="custom_${field.id}"]:checked`);
-            const selectedOptions = Array.from(checkboxes).map(cb => cb.value);
-            return { id: field.id, value: selectedOptions };
-          } else {
-            const value = document.getElementById(`custom_${field.id}`)?.value || '';
-            return { id: field.id, value };
           }
-        })));
-        data.customField = data.customField.filter(cf => cf.value !== '' && cf.value.length !== 0);
-      } else if (activeCategory !== 'clients') {
+        });
+
+      await Promise.all(fileUploadPromises);
+
+      // Handle other custom fields
+      const otherCustomFields = customerCustomFields.filter(field => field.type !== 'FILE_UPLOAD');
+      data.customFields = otherCustomFields.map(field => {
+        if (field.type === 'SINGLE_OPTIONS') {
+          const selectElement = document.getElementById(`custom_${field.id}`);
+          const value = selectElement ? selectElement.value : '';
+          return { id: field.id, value };
+        } else if (field.type === 'RADIO') {
+          const checkedRadio = document.querySelector(`input[name="custom_${field.id}"]:checked`);
+          const value = checkedRadio ? checkedRadio.value : '';
+          return { id: field.id, value };
+        } else if (field.type === 'MULTIPLE_OPTIONS' || field.type === 'CHECKBOX') {
+          const checkboxes = document.querySelectorAll(`input[name="custom_${field.id}"]:checked`);
+          const selectedOptions = Array.from(checkboxes).map(cb => cb.value);
+          return { id: field.id, value: selectedOptions };
+        } else {
+          const value = document.getElementById(`custom-d ${field.id}`)?.value || '';
+          return { id: field.id, value };
+        }
+      });
+
+      // Handle clientNiche for non-client categories
+      if (activeCategory !== 'clients') {
         const nicheValue = document.getElementById('custom_niche').value;
         if (nicheValue) {
-          data.customField.push({ id: 'niche', value: nicheValue });
+          data.customFields.push({ id: 'PjQ2rir2JEogi9aUAP2s', value: nicheValue });
         }
       }
+
+      data.customFields = data.customFields.filter(cf => cf.value !== '' && cf.value.length !== 0);
 
       const url = selectedContactId
         ? `https://rest.gohighlevel.com/v1/contacts/${selectedContactId}?locationId=${locationId}`
@@ -624,15 +631,13 @@
       } finally {
         loader.style.display = 'none';
       }
-    })
+    });
 
     async function changeToCustomer(contactId) {
       selectedContactId = contactId;
       try {
         const url = `https://rest.gohighlevel.com/v1/contacts/${contactId}?locationId=${locationId}`;
-        const response = await fetch(url, {
-          headers: { Authorization: `Bearer ${apiKey}` },
-        });
+        const response = await fetch(url, { headers: { Authorization: `Bearer ${apiKey}` } });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const contact = await response.json();
         let tags = contact.tags || [];
