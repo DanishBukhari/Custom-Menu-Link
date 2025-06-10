@@ -1,36 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Network Interface</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .modal { transition: opacity 0.3s ease-in-out; display: none; }
-    .modal.show { display: flex; }
-    .modal-content { transform: translateY(-20px); transition: transform 0.3s ease-in-out; width: 100vw; height: 100vh; max-width: none; max-height: none; padding: 0; overflow: hidden; display: flex; background-color: #fff; margin-top: 15px; }
-    .modal-open .modal-content { transform: translateY(0); }
-    .button { transition: background-color 0.3s ease, transform 0.1s ease; color: white; }
-    .button:hover { transform: scale(1.05); }
-    .form-group input, .form-group textarea, .form-group select { transition: border-color 0.3s ease; font-size: 16px; padding: 12px; }
-    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #d0a547; outline: none; }
-    .form-actions { position: sticky; bottom: -5%; background-color: #fff; padding: 1.5rem; border-top: 1px solid #e5e7eb; z-index: 10; }
-    .loader { display: none; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-left: 1rem; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .bg-gold { background-color: #d0a547; }
-    .text-gold { color: #d0a547; }
-    .bg-dark-green { background-color: #304528; }
-    .text-dark-green { color: #304528; }
-    .sidebar { width: 250px; background-color: #304528; padding: 20px; border-right: 1px solid #e5e7eb; overflow-y: hidden; }
-    .main-content { flex-grow: 1; padding: 20px; overflow-y: auto; }
-    .sidebar ul li { margin-bottom: 10px; }
-    .sidebar ul li button { width: 100%; text-align: left; padding: 10px; border-radius: 4px; }
-    .subcategory-list { margin-left: 15px; margin-top: 5px; }
-    .search-bar { width: 200px; }
-    .subcategory-button { background-color: transparent; color: white; padding: 8px 12px; border-radius: 4px; margin-top: 5px; }
-    .subcategory-button:hover { color: #d0a547; }
+    .modal {
+      transition: opacity 0.3s ease-in-out;
+      display: none;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      transform: translateY(-20px);
+      transition: transform 0.3s ease-in-out;
+      width: 100vw;
+      height: 100vh;
+      max-width: none;
+      max-height: none;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      background-color: #fff;
+      margin-top: 15px;
+    }
+
+    .modal-open .modal-content {
+      transform: translateY(0);
+    }
+
+    .button {
+      transition: background-color 0.3s ease, transform 0.1s ease;
+      color: white;
+    }
+
+    .button:hover {
+      transform: scale(1.05);
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      transition: border-color 0.3s ease;
+      font-size: 16px;
+      padding: 12px;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: #d0a547;
+      outline: none;
+    }
+
+    .form-actions {
+      position: sticky;
+      bottom: -5%;
+      background-color: #fff;
+      padding: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+      z-index: 10;
+    }
+
+    .loader {
+      display: none;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin-left: 1rem;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .bg-gold {
+      background-color: #d0a547;
+    }
+
+    .text-gold {
+      color: #d0a547;
+    }
+
+    .bg-dark-green {
+      background-color: #304528;
+    }
+
+    .text-dark-green {
+      color: #304528;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #304528;
+      padding: 20px;
+      border-right: 1px solid #e5e7eb;
+      overflow-y: hidden;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .sidebar ul li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar ul li button {
+      width: 100%;
+      text-align: left;
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    .subcategory-list {
+      margin-left: 15px;
+      margin-top: 5px;
+    }
+
+    .search-bar {
+      width: 200px;
+    }
+
+    .subcategory-button {
+      background-color: transparent;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+
+    .subcategory-button:hover {
+      color: #d0a547;
+    }
   </style>
 </head>
+
 <body class="bg-gray-100 min-h-screen flex items-center justify-center" onload="openModal()">
   <div id="modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
     <div class="modal-content">
@@ -38,36 +159,45 @@
         <h3 class="text-2xl font-semibold text-white mb-4">Categories</h3>
         <ul>
           <li>
-            <button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('clients')">Clients</button>
+            <button class="bg-dark-green text-white button px-4 py-2 rounded-lg"
+              onclick="setCategory('clients')">Clients</button>
             <ul id="subcategory-list" class="hidden">
               <li><button class="subcategory-button" onclick="setSubcategory('leads')">Leads</button></li>
               <li><button class="subcategory-button" onclick="setSubcategory('customers')">Customers</button></li>
             </ul>
           </li>
-          <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('real estate')">Real Estate</button></li>
-          <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('Conveyance lawyers')">Lawyers</button></li>
-          <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg button" onclick="setCategory('tradies')">Tradies</button></li>
-          <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg" onclick="setCategory('finance')">Finance</button></li>
+          <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg"
+              onclick="setCategory('real estate')">Real Estate</button></li>
+          <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg"
+              onclick="setCategory('Conveyance lawyers')">Lawyers</button></li>
+          <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg button"
+              onclick="setCategory('tradies')">Tradies</button></li>
+          <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg"
+              onclick="setCategory('finance')">Finance</button></li>
         </ul>
       </div>
       <div class="main-content">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-semibold text-dark-green">Network Contacts</h2>
-          <input type="text" id="search-input" placeholder="Search clients..." class="search-bar p-2 border border-gray-300 rounded-lg text-white" oninput="searchContacts()">
+          <input type="text" id="search-input" placeholder="Search clients..."
+            class="search-bar p-2 border border-gray-300 rounded-lg text-white" oninput="searchContacts()">
         </div>
         <div id="contact-list" class="bg-gray-50 p-4 rounded-lg"></div>
-        <button id="new-contact-btn" class="button bg-gold text-white px-4 py-2 rounded-lg mt-2 hover:bg-yellow-600" style="display: none; background: #d0a547;" onclick="showNewContactForm()">New Contact</button>
+        <button id="new-contact-btn" class="button bg-gold text-white px-4 py-2 rounded-lg mt-2 hover:bg-yellow-600"
+          style="display: none; background: #d0a547;" onclick="showNewContactForm()">New Contact</button>
         <div id="contact-form" class="mt-4" style="display: none;">
           <h3 id="form-title" class="text-xl font-semibold mb-4"></h3>
           <form id="contact-form-element">
             <div id="standard-fields" class="space-y-4"></div>
             <div id="custom-fields" class="space-y-4 mt-4"></div>
             <div class="form-actions flex space-x-2">
-              <button type="submit" class="button bg-dark-green text-white px-6 py-2 rounded-lg hover:bg-green-800 flex items-center">
+              <button type="submit"
+                class="button bg-dark-green text-white px-6 py-2 rounded-lg hover:bg-green-800 flex items-center">
                 Save
                 <span id="form-loader" class="loader"></span>
               </button>
-              <button type="button" class="button bg-gray-300 text-white px-6 py-2 rounded-lg hover:bg-gray-400" onclick="closeForm()">Cancel</button>
+              <button type="button" class="button bg-gray-300 text-white px-6 py-2 rounded-lg hover:bg-gray-400"
+                onclick="closeForm()">Cancel</button>
             </div>
           </form>
         </div>
@@ -151,7 +281,7 @@
       { label: 'Title Search', id: 'wapXPv1hnCYDpDK1vfTa', type: 'LARGE_TEXT' },
       { label: 'Mortgage Broker Check Complete', id: 'zVVmbafhz3TZ1xfOK9yj', type: 'RADIO', options: ['Yes', 'No'] },
       { label: 'Contract Sent to Solicitor', id: 'txxrIggN291g9OISLz3y', type: 'LARGE_TEXT' },
-      { label: 'Offer received by real estate agent', id: 'zVVmbafhz3TZ1xfOK9yj', type: 'RADIO', options: ['Yes', 'No'] },
+      { label: 'Offer received by real estate agent', id: 'm9i7HQXWY17PfBBFoOwc', type: 'RADIO', options: ['Yes', 'No'] },
       { label: 'Full Name (Client 2)', id: 'wHB4bJhT9kuFPNAHMygP', type: 'TEXT' },
       { label: 'Address (Client 2)', id: '634PeulkBMxDwi5Mw9tf', type: 'LARGE_TEXT' },
       { label: 'Full Name (Client 3)', id: 'NcZ9Q0kt2Um0idKhmIhM', type: 'TEXT' },
@@ -171,8 +301,7 @@
       { label: 'REIQ Checklist (Client 2)', id: 'OfCZ3qfSOkcjb8JXG7Nj', type: 'FILE_UPLOAD' },
       { label: 'REIQ Checklist (Client 3)', id: '5QyH4ryvNdDopxkLa1pT', type: 'FILE_UPLOAD' },
       { label: 'Address (Client 3)', id: '0TR2XsNuizgdI43JuI9X', type: 'LARGE_TEXT' },
-      { label: 'Email (Client 3)', id: 'zBRgbclelurPoN84ZqRX', type: 'TEXT' },
-      { label: 'Client Niche', id: 'PjQ2rir2JEogi9aUAP2s', type: 'TEXT' }
+      { label: 'Email (Client 3)', id: 'zBRgbclelurPoN84ZqRX', type: 'TEXT' }
     ];
 
     function openModal() {
@@ -196,7 +325,7 @@
       activeCategory = category;
       allContacts = [];
       document.getElementById('subcategory-list').classList.toggle('hidden', category !== 'clients');
-      document.getElementById('new-contact-btn').style.display = 'block'; // Show New Contact for all categories
+      document.getElementById('new-contact-btn').style.display = 'block';
       document.querySelectorAll('.sidebar button').forEach(btn => {
         btn.classList.remove('bg-gold', 'text-white');
         btn.classList.add('bg-dark-green', 'text-white');
@@ -217,7 +346,7 @@
       if (activeCategory !== 'clients') return;
       closeForm();
       activeSubcategory = subcategory;
-      document.getElementById('new-contact-btn').style.display = 'block'; // Show New Contact for subcategories
+      document.getElementById('new-contact-btn').style.display = 'block';
       document.querySelectorAll('#subcategory-list button').forEach(btn => {
         btn.classList.remove('bg-gold', 'text-white');
         btn.classList.add('subcategory-button');
@@ -271,7 +400,7 @@
 
     function searchContacts() {
       const term = document.getElementById('search-input').value.toLowerCase();
-      const filteredContacts = allContacts.filter(contact => 
+      const filteredContacts = allContacts.filter(contact =>
         `${contact.firstName || ''} ${contact.lastName || ''}`.toLowerCase().includes(term)
       );
       displayContacts(filteredContacts);
@@ -356,7 +485,7 @@
           if (components && !addressValue) addressValue = components;
           else if (components) addressValue = [addressValue, components].filter(v => v).join(', ').trim();
 
-          customFieldsDiv.innerHTML = customerCustomFields.map(field => {
+          customFieldsDiv.innerHTML = customerCustomFields.filter(field => field.id !== 'PjQ2rir2JEogi9aUAP2s').map(field => {
             let fieldValue = fieldMap[field.id] || '';
             if (field.label === 'Full Name') fieldValue = `${contact.firstName || ''} ${contact.lastName || ''}`.trim();
             if (field.label === 'Address') fieldValue = addressValue;
@@ -450,7 +579,7 @@
           customFieldsDiv.innerHTML = `
             <div class="form-group">
               <label class="block text-dark-green font-medium mb-1">Client Niche:</label>
-              <input type="text" id="custom_niche" value="${nicheValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
+              <input type="text" id="custom_PjQ2rir2JEogi9aUAP2s" value="${nicheValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
             </div>
           `;
           console.log('Custom Field IDs:', ['PjQ2rir2JEogi9aUAP2s']);
@@ -484,37 +613,37 @@
 
       const customFieldsDiv = document.getElementById('custom-fields');
       if (activeCategory === 'clients' && activeSubcategory === 'customers') {
-        customFieldsDiv.innerHTML = customerCustomFields.map(field => `
+        customFieldsDiv.innerHTML = customerCustomFields.filter(field => field.id !== 'PjQ2rir2JEogi9aUAP2s').map(field => `
           <div class="form-group">
             <label class="block font-medium mb-1">${field.label}:</label>
-            ${field.type === 'FILE_UPLOAD' ? 
-              `<input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg" ${field.multiple ? 'multiple' : ''}>` :
-            field.type === 'LARGE_TEXT' ? 
+            ${field.type === 'FILE_UPLOAD' ?
+            `<input type="file" id="custom_${field.id}_new" accept="image/*,application/pdf" class="w-full p-2 border border-gray-300 rounded-lg" ${field.multiple ? 'multiple' : ''}>` :
+            field.type === 'LARGE_TEXT' ?
               `<textarea id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold"></textarea>` :
-            field.type === 'SINGLE_OPTIONS' ? 
-              `<select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
+              field.type === 'SINGLE_OPTIONS' ?
+                `<select id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
                 <option value="">Select an option</option>
                 ${field.options.map(option => `<option value="${option}">${option}</option>`).join('')}
               </select>` :
-            field.type === 'RADIO' ? 
-              field.options.map(option => `
+                field.type === 'RADIO' ?
+                  field.options.map(option => `
                 <label class="inline-flex items-center mr-4 mb-2">
                   <input type="radio" name="custom_${field.id}" value="${option}" class="mr-2">
                   <span>${option}</span>
                 </label>
               `).join('') :
-            field.type === 'MULTIPLE_OPTIONS' || field.type === 'CHECKBOX' ? 
-              field.options.map(option => `
+                  field.type === 'MULTIPLE_OPTIONS' || field.type === 'CHECKBOX' ?
+                    field.options.map(option => `
                 <label class="inline-flex items-center mr-4 mb-2">
                   <input type="checkbox" name="custom_${field.id}" value="${option}" class="mr-2">
                   <span>${option}</span>
                 </label>
               `).join('') :
-            field.type === 'DATE' ? 
-              `<input type="date" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">` :
-            field.type === 'PHONE' ? 
-              `<input type="tel" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">` :
-              `<input type="text" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">`}
+                    field.type === 'DATE' ?
+                      `<input type="date" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">` :
+                      field.type === 'PHONE' ?
+                        `<input type="tel" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">` :
+                        `<input type="text" id="custom_${field.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">`}
           </div>
         `).join('');
         console.log('Custom Field IDs for new contact:', customerCustomFields.map(field => field.id));
@@ -522,7 +651,7 @@
         customFieldsDiv.innerHTML = `
           <div class="form-group">
             <label class="block text-dark-green font-medium mb-1">Client Niche:</label>
-            <input type="text" id="custom_niche" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
+            <input type="text" id="custom_PjQ2rir2JEogi9aUAP2s" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
           </div>
         `;
         console.log('Custom Field IDs for new contact:', ['PjQ2rir2JEogi9aUAP2s']);
@@ -543,7 +672,7 @@
         email: document.getElementById('email').value,
         phone: document.getElementById('phone').value,
         tags: [activeCategory === 'clients' ? (activeSubcategory === 'leads' ? 'new lead' : 'customer') : activeCategory.toLowerCase()],
-        customFields: []
+        customField: []  // Changed from customFields to customField
       };
 
       // Handle file uploads for multiple files
@@ -569,50 +698,52 @@
                   throw new Error(`Upload failed: ${errorData.error || response.statusText}`);
                 }
                 const result = await response.json();
-                uploadedFiles.push(result.url); // Store the URL from backend response
+                if (result.url) {
+                  uploadedFiles.push(result.url);
+                }
               } catch (error) {
                 console.error(`Error uploading file ${file.name} for ${field.label}:`, error.message);
               }
             }
             if (uploadedFiles.length > 0) {
-              data.customFields.push({ id: field.id, value: uploadedFiles.length > 1 ? uploadedFiles : uploadedFiles[0] });
+              data.customField.push({  // Changed from customFields to customField
+                id: field.id,
+                value: field.multiple ? uploadedFiles : uploadedFiles[0]
+              });
             }
           }
         });
 
       await Promise.all(fileUploadPromises);
 
-      // Handle other custom fields
-      const otherCustomFields = customerCustomFields.filter(field => field.type !== 'FILE_UPLOAD');
-      otherCustomFields.forEach(field => {
-        let value;
-        if (field.type === 'SINGLE_OPTIONS') {
-          const selectElement = document.getElementById(`custom_${field.id}`);
-          value = selectElement ? selectElement.value : '';
-        } else if (field.type === 'RADIO') {
-          const checkedRadio = document.querySelector(`input[name="custom_${field.id}"]:checked`);
-          value = checkedRadio ? checkedRadio.value : '';
-        } else if (field.type === 'MULTIPLE_OPTIONS' || field.type === 'CHECKBOX') {
-          const checkboxes = document.querySelectorAll(`input[name="custom_${field.id}"]:checked`);
-          value = Array.from(checkboxes).map(cb => cb.value);
-        } else {
-          value = document.getElementById(`custom_${field.id}`)?.value || '';
-        }
-        if (value && (typeof value === 'string' || (Array.isArray(value) && value.length > 0))) {
-          data.customFields.push({ id: field.id, value });
-        }
-      });
-
-      // Handle Client Niche for non-client categories
-      if (activeCategory !== 'clients') {
-        const nicheValue = document.getElementById('custom_niche')?.value || '';
-        if (nicheValue) {
-          data.customFields.push({ id: 'PjQ2rir2JEogi9aUAP2s', value: nicheValue });
-        }
+      // Collect other custom fields
+      if (activeCategory === 'clients' && activeSubcategory === 'customers') {
+        const otherCustomFields = customerCustomFields.filter(field => field.type !== 'FILE_UPLOAD');
+        otherCustomFields.forEach(field => {
+          let value;
+          if (field.type === 'SINGLE_OPTIONS') {
+            const selectElement = document.getElementById(`custom_${field.id}`);
+            value = selectElement ? selectElement.value : '';
+          } else if (field.type === 'RADIO') {
+            const checkedRadio = document.querySelector(`input[name="custom_${field.id}"]:checked`);
+            value = checkedRadio ? checkedRadio.value : '';
+          } else if (field.type === 'MULTIPLE_OPTIONS' || field.type === 'CHECKBOX') {
+            const checkboxes = document.querySelectorAll(`input[name="custom_${field.id}"]:checked`);
+            value = Array.from(checkboxes).map(cb => cb.value);
+          } else {
+            value = document.getElementById(`custom_${field.id}`)?.value || '';
+          }
+          data.customField.push({ id: field.id, value });  // Changed from customFields to customField
+        });
+      } else if (activeCategory !== 'clients') {
+        const nicheValue = document.getElementById('custom_PjQ2rir2JEogi9aUAP2s')?.value || '';
+        data.customField.push({ id: 'PjQ2rir2JEogi9aUAP2s', value: nicheValue });  // Changed from customFields to customField
       }
 
-      // Filter out empty custom fields
-      data.customFields = data.customFields.filter(cf => cf.value !== '' && (Array.isArray(cf.value) ? cf.value.length > 0 : true));
+      // Filter out custom fields with empty values
+      data.customField = data.customField.filter(cf => cf.value !== '' && (!Array.isArray(cf.value) || cf.value.length > 0));
+
+      console.log('Request Body:', JSON.stringify(data, null, 2)); // Log request body for debugging
 
       const url = selectedContactId
         ? `https://rest.gohighlevel.com/v1/contacts/${selectedContactId}?locationId=${locationId}`
@@ -667,4 +798,5 @@
     }
   </script>
 </body>
+
 </html>
