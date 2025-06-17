@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Network Interface</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/692ff4c859.js" crossorigin="anonymous"></script>
   <style>
     .modal {
       transition: opacity 0.3s ease-in-out;
@@ -79,30 +80,14 @@
     }
 
     @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-
-      100% {
-        transform: rotate(360deg);
-      }
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
-    .bg-gold {
-      background-color: #d0a547;
-    }
-
-    .text-gold {
-      color: #d0a547;
-    }
-
-    .bg-dark-green {
-      background-color: #304528;
-    }
-
-    .text-dark-green {
-      color: #304528;
-    }
+    .bg-gold { background-color: #d0a547; }
+    .text-gold { color: #d0a547; }
+    .bg-dark-green { background-color: #304528; }
+    .text-dark-green { color: #304528; }
 
     .sidebar {
       width: 250px;
@@ -118,9 +103,7 @@
       overflow-y: auto;
     }
 
-    .sidebar ul li {
-      margin-bottom: 10px;
-    }
+    .sidebar ul li { margin-bottom: 10px; }
 
     .sidebar ul li button {
       width: 100%;
@@ -134,9 +117,7 @@
       margin-top: 5px;
     }
 
-    .search-bar {
-      width: 200px;
-    }
+    .search-bar { width: 200px; }
 
     .subcategory-button {
       background-color: transparent;
@@ -146,8 +127,23 @@
       margin-top: 5px;
     }
 
-    .subcategory-button:hover {
-      color: #d0a547;
+    .subcategory-button:hover { color: #d0a547; }
+
+    /* Tooltip styles */
+    /* .tooltip-text {
+      hidden group-hover:block absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10;
+      
+    } */
+
+    .tooltip-text::before {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 5px solid #1f2937;
     }
   </style>
 </head>
@@ -159,45 +155,36 @@
         <h3 class="text-2xl font-semibold text-white mb-4">Categories</h3>
         <ul>
           <li>
-            <button class="bg-dark-green text-white button px-4 py-2 rounded-lg"
-              onclick="setCategory('clients')">Clients</button>
+            <button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('clients')">Clients</button>
             <ul id="subcategory-list" class="hidden">
               <li><button class="subcategory-button" onclick="setSubcategory('leads')">Leads</button></li>
               <li><button class="subcategory-button" onclick="setSubcategory('customers')">Customers</button></li>
             </ul>
           </li>
-          <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg"
-              onclick="setCategory('real estate')">Real Estate</button></li>
-          <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg"
-              onclick="setCategory('Conveyance lawyers')">Lawyers</button></li>
-          <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg button"
-              onclick="setCategory('tradies')">Tradies</button></li>
-          <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg"
-              onclick="setCategory('finance')">Finance</button></li>
+          <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('real estate')">Real Estate</button></li>
+          <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('Conveyance lawyers')">Lawyers</button></li>
+          <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg button" onclick="setCategory('tradies')">Tradies</button></li>
+          <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg" onclick="setCategory('finance')">Finance</button></li>
         </ul>
       </div>
       <div class="main-content">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-semibold text-dark-green">Network Contacts</h2>
-          <input type="text" id="search-input" placeholder="Search clients..."
-            class="search-bar p-2 border border-gray-300 rounded-lg" oninput="searchContacts()">
+          <input type="text" id="search-input" placeholder="Search clients..." class="search-bar p-2 border border-gray-300 rounded-lg" oninput="searchContacts()">
         </div>
         <div id="contact-list" class="bg-gray-50 p-4 rounded-lg"></div>
-        <button id="new-contact-btn" class="button bg-gold text-white px-4 py-2 rounded-lg mt-2 hover:bg-yellow-600"
-          style="display: none; background: #d0a547;" onclick="showNewContactForm()">New Contact</button>
+        <button id="new-contact-btn" class="button bg-gold text-white px-4 py-2 rounded-lg mt-2 hover:bg-yellow-600" style="display: none; background: #d0a547;" onclick="showNewContactForm()">New Contact</button>
         <div id="contact-form" class="mt-4" style="display: none;">
           <h3 id="form-title" class="text-xl font-semibold mb-4"></h3>
           <form id="contact-form-element">
             <div id="standard-fields" class="space-y-4"></div>
             <div id="custom-fields" class="space-y-4 mt-4"></div>
             <div class="form-actions flex space-x-2">
-              <button type="submit"
-                class="button bg-dark-green text-white px-6 py-2 rounded-lg hover:bg-green-800 flex items-center">
+              <button type="submit" class="button bg-dark-green text-white px-6 py-2 rounded-lg hover:bg-green-800 flex items-center">
                 Save
                 <span id="form-loader" class="loader"></span>
               </button>
-              <button type="button" class="button bg-gray-300 text-white px-6 py-2 rounded-lg hover:bg-gray-400"
-                onclick="closeForm()">Cancel</button>
+              <button type="button" class="button bg-gray-300 text-white px-6 py-2 rounded-lg hover:bg-gray-400" onclick="closeForm()">Cancel</button>
             </div>
           </form>
         </div>
@@ -212,6 +199,7 @@
     let activeSubcategory = 'leads';
     let selectedContactId = null;
     let allContacts = [];
+    let currentTag = ''; // Track current tag for search
 
     const customerCustomFields = [
       { label: 'Full Name', id: 'EXjXnQEL140VE4XYhaSX', type: 'TEXT' },
@@ -360,21 +348,39 @@
     }
 
     async function loadContacts() {
-      const tag = activeCategory === 'clients' ? (activeSubcategory === 'leads' ? 'new lead' : 'customer') : activeCategory.toLowerCase();
-      const url = `https://rest.gohighlevel.com/v1/contacts?locationId=${locationId}&tags=${encodeURIComponent(tag)}`;
-      try {
-        document.getElementById('contact-list').innerHTML = '<p class="text-gray-600 text-center py-4">Loading contacts...</p>';
-        const response = await fetch(url, { headers: { Authorization: `Bearer ${apiKey}` } });
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const data = await response.json();
-        allContacts = data.contacts || (data.contact ? [data.contact] : []);
-        const filteredContacts = allContacts.filter(contact => contact.tags && contact.tags.includes(tag));
-        displayContacts(filteredContacts);
-      } catch (error) {
-        console.error('Error loading contacts:', error);
-        document.getElementById('contact-list').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contacts.</p>';
-      }
-    }
+  const tag = activeCategory === 'clients' ? (activeSubcategory === 'leads' ? 'new lead' : 'customer') : activeCategory.toLowerCase();
+  currentTag = tag; // Update current tag
+  const url = `https://rest.gohighlevel.com/v1/contacts?locationId=${locationId}&tags=${encodeURIComponent(tag)}`;
+  
+  // Show loading text
+  document.getElementById('contact-list').innerHTML = '<p class="text-gray-600 text-center py-4">Loading contacts...</p>';
+  
+  // Record start time for delay
+  const startTime = Date.now();
+  try {
+    const response = await fetch(url, { headers: { Authorization: `Bearer ${apiKey}` } });
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    const data = await response.json();
+    allContacts = data.contacts || (data.contact ? [data.contact] : []);
+    const filteredContacts = allContacts.filter(contact => contact.tags && contact.tags.includes(tag));
+    
+    // Calculate elapsed time and ensure 5-second delay
+    const elapsedTime = Date.now() - startTime;
+    const remainingTime = Math.max(0, 5000 - elapsedTime);
+    await new Promise(resolve => setTimeout(resolve, remainingTime));
+    
+    // Display contacts after delay
+    displayContacts(filteredContacts);
+  } catch (error) {
+    console.error('Error loading contacts:', error);
+    // Still respect 5-second delay on error
+    const elapsedTime = Date.now() - startTime;
+    const remainingTime = Math.max(0, 5000 - elapsedTime);
+    await new Promise(resolve => setTimeout(resolve, remainingTime));
+    
+    document.getElementById('contact-list').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contacts.</p>';
+  }
+}
 
     function displayContacts(contacts) {
       const list = document.getElementById('contact-list');
@@ -388,10 +394,32 @@
         li.innerHTML = `
           <span class="text-dark-green">${firstName} ${lastName}</span>
           <div class="space-x-2">
-            <button class="button bg-gold text-white px-3 py-1 rounded-lg hover:bg-yellow-600" onclick="loadContact('${contactId}')">View</button>
-            <button class="button bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600" onclick="deleteContact('${contactId}')">Delete</button>
-            <button class="button bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600" onclick="addNote('${contactId}')">Add Note</button>
-            ${activeCategory === 'clients' && activeSubcategory === 'leads' ? `<button class="button text-white px-3 py-1 rounded-lg hover:bg-yellow-600 bg-gold" onclick="changeToCustomer('${contactId}')">Change to Customer</button>` : ''}
+            <div class="relative group inline-block">
+              <button class=" px-3 py-1 rounded-lg" onclick="loadContact('${contactId}')" data-tooltip="Edit">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <span class="tooltip-text hidden group-hover:block absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">Edit</span>
+            </div>
+            <div class="relative group inline-block">
+              <button class="px-3 py-1 rounded-lg" onclick="deleteContact('${contactId}')" data-tooltip="Delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+              <span class="tooltip-text hidden group-hover:block absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">Delete</span>
+            </div>
+            <div class="relative group inline-block">
+              <button class=" px-3 py-1 rounded-lg" onclick="addNote('${contactId}')" data-tooltip="Add Note">
+                <i class="fa-solid fa-file-pen"></i>
+              </button>
+              <span class="tooltip-text hidden group-hover:block absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">Add Note</span>
+            </div>
+            ${activeCategory === 'clients' && activeSubcategory === 'leads' ? `
+              <div class="relative group inline-block">
+                <button class=" px-3 py-1 rounded-lg" onclick="changeToCustomer('${contactId}')" data-tooltip="Change to Customer">
+                  <i class="fa-solid fa-person-walking-arrow-right"></i>
+                </button>
+                <span class="tooltip-text hidden group-hover:block absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">Change to Customer</span>
+              </div>
+            ` : ''}
           </div>
         `;
         list.appendChild(li);
@@ -400,8 +428,10 @@
 
     function searchContacts() {
       const term = document.getElementById('search-input').value.toLowerCase();
+      // Filter by both search term and current tag
       const filteredContacts = allContacts.filter(contact =>
-        `${contact.firstName || ''} ${contact.lastName || ''}`.toLowerCase().includes(term)
+        `${contact.firstName || ''} ${contact.lastName || ''}`.toLowerCase().includes(term) &&
+        contact.tags && contact.tags.includes(currentTag)
       );
       displayContacts(filteredContacts);
     }
@@ -672,7 +702,7 @@
         email: document.getElementById('email').value,
         phone: document.getElementById('phone').value,
         tags: [activeCategory === 'clients' ? (activeSubcategory === 'leads' ? 'new lead' : 'customer') : activeCategory.toLowerCase()],
-        customField: []  // Changed from customFields to customField
+        customField: []
       };
 
       // Handle file uploads for multiple files
@@ -706,7 +736,7 @@
               }
             }
             if (uploadedFiles.length > 0) {
-              data.customField.push({  // Changed from customFields to customField
+              data.customField.push({
                 id: field.id,
                 value: field.multiple ? uploadedFiles : uploadedFiles[0]
               });
@@ -733,21 +763,24 @@
           } else {
             value = document.getElementById(`custom_${field.id}`)?.value || '';
           }
-          data.customField.push({ id: field.id, value });  // Changed from customFields to customField
+          data.customField.push({ id: field.id, value });
         });
       } else if (activeCategory !== 'clients') {
         const nicheValue = document.getElementById('custom_PjQ2rir2JEogi9aUAP2s')?.value || '';
-        data.customField.push({ id: 'PjQ2rir2JEogi9aUAP2s', value: nicheValue });  // Changed from customFields to customField
+        data.customField.push({ id: 'PjQ2rir2JEogi9aUAP2s', value: nicheValue });
       }
 
       // Filter out custom fields with empty values
       data.customField = data.customField.filter(cf => cf.value !== '' && (!Array.isArray(cf.value) || cf.value.length > 0));
 
-      console.log('Request Body:', JSON.stringify(data, null, 2)); // Log request body for debugging
+      console.log('Request Body:', JSON.stringify(data, null, 2));
 
       const url = selectedContactId
         ? `https://rest.gohighlevel.com/v1/contacts/${selectedContactId}?locationId=${locationId}`
         : `https://rest.gohighlevel.com/v1/contacts?locationId=${locationId}`;
+      
+      // Ensure loader shows for at least 5 seconds
+      const startTime = Date.now();
       try {
         const response = await fetch(url, {
           method: selectedContactId ? 'PUT' : 'POST',
@@ -759,11 +792,22 @@
           throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
         }
         console.log('Save Contact Response:', await response.json());
+
+        // Calculate remaining time to ensure 5 seconds total
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, 5000 - elapsedTime);
+        
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+
         alert(selectedContactId ? 'Contact updated successfully!' : 'Contact created successfully!');
         closeForm();
         loadContacts();
       } catch (error) {
         console.error('Error saving contact:', error);
+        // Still respect 5-second delay even on error
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, 5000 - elapsedTime);
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
         alert('Error saving contact. Please try again.');
       } finally {
         loader.style.display = 'none';
