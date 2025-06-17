@@ -366,7 +366,7 @@
     
     // Calculate elapsed time and ensure 5-second delay
     const elapsedTime = Date.now() - startTime;
-    const remainingTime = Math.max(0, 5000 - elapsedTime);
+    const remainingTime = Math.max(0, 8000 - elapsedTime);
     await new Promise(resolve => setTimeout(resolve, remainingTime));
     
     // Display contacts after delay
@@ -375,7 +375,7 @@
     console.error('Error loading contacts:', error);
     // Still respect 5-second delay on error
     const elapsedTime = Date.now() - startTime;
-    const remainingTime = Math.max(0, 5000 - elapsedTime);
+    const remainingTime = Math.max(0, 8000 - elapsedTime);
     await new Promise(resolve => setTimeout(resolve, remainingTime));
     
     document.getElementById('contact-list').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contacts.</p>';
@@ -795,7 +795,7 @@
 
         // Calculate remaining time to ensure 5 seconds total
         const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(0, 5000 - elapsedTime);
+        const remainingTime = Math.max(0, 2000 - elapsedTime);
         
         await new Promise(resolve => setTimeout(resolve, remainingTime));
 
@@ -806,7 +806,7 @@
         console.error('Error saving contact:', error);
         // Still respect 5-second delay even on error
         const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(0, 5000 - elapsedTime);
+        const remainingTime = Math.max(0, 8000 - elapsedTime);
         await new Promise(resolve => setTimeout(resolve, remainingTime));
         alert('Error saving contact. Please try again.');
       } finally {
