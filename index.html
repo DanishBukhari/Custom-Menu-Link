@@ -112,38 +112,37 @@
       border-radius: 4px;
     }
 
-    .subcategory-list {
-      margin-left: 15px;
-      margin-top: 5px;
-    }
-
     .search-bar { width: 200px; }
 
-    .subcategory-button {
-      background-color: transparent;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 4px;
-      margin-top: 5px;
+    .action-bar {
+      /* position: fixed;
+      top: 0;
+      left: 0; */
+      width: 100%;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 10px 20px;
+      z-index: 20;
     }
 
-    .subcategory-button:hover { color: #d0a547; }
-
-    /* Tooltip styles */
-    /* .tooltip-text {
-      hidden group-hover:block absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10;
-      
-    } */
-
-    .tooltip-text::before {
-      content: '';
+    .tooltip-text {
+      display: none;
       position: absolute;
-      top: -5px;
+      top: 100%;
       left: 50%;
       transform: translateX(-50%);
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-bottom: 5px solid #1f2937;
+      margin-top: 8px;
+      background-color: #1f2937;
+      color: white;
+      font-size: 12px;
+      border-radius: 4px;
+      padding: 4px 8px;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    .group:hover .tooltip-text {
+      display: block;
     }
   </style>
 </head>
@@ -154,13 +153,8 @@
       <div class="sidebar">
         <h3 class="text-2xl font-semibold text-white mb-4">Categories</h3>
         <ul>
-          <li>
-            <button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('clients')">Clients</button>
-            <ul id="subcategory-list" class="hidden">
-              <li><button class="subcategory-button" onclick="setSubcategory('leads')">Leads</button></li>
-              <li><button class="subcategory-button" onclick="setSubcategory('customers')">Customers</button></li>
-            </ul>
-          </li>
+          <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('leads')">Leads</button></li>
+          <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('customers')">Customers</button></li>
           <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('real estate')">Real Estate</button></li>
           <li><button class="bg-dark-green text-white button px-4 py-2 rounded-lg" onclick="setCategory('Conveyance lawyers')">Lawyers</button></li>
           <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg button" onclick="setCategory('tradies')">Tradies</button></li>
@@ -168,10 +162,43 @@
         </ul>
       </div>
       <div class="main-content">
-        <div class="flex justify-between items-center mb-4">
+        
+        <div class="flex justify-between items-center mb-4 mt-8">
           <h2 class="text-2xl font-semibold text-dark-green">Network Contacts</h2>
-          <input type="text" id="search-input" placeholder="Search clients..." class="search-bar p-2 border border-gray-300 rounded-lg" oninput="searchContacts()">
+          
+          <input type="text" id="search-input" placeholder="Search contacts..." class="search-bar p-2 border border-gray-300 rounded-lg" oninput="searchContacts()">
         </div>
+
+        <div id="action-bar" class="action-bar">
+          <div class="flex space-x-4">
+            <div class="relative group">
+              <button class="button bg-red-500 text-white px-4 py-2 rounded-lg disabled:opacity-50" onclick="bulkDelete()" disabled>
+                <i class="fa-solid fa-trash"></i>
+              </button>
+              <span class="tooltip-text">Delete Selected</span>
+            </div>
+            <div class="relative group">
+              <button class="button bg-blue-500 text-white px-4 py-2 rounded-lg disabled:opacity-50" onclick="bulkLoadContacts()" disabled>
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <span class="tooltip-text">View Selected</span>
+            </div>
+            <div class="relative group">
+              <button class="button bg-purple-500 text-white px-4 py-2 rounded-lg disabled:opacity-50" onclick="bulkAddNote()" disabled>
+                <i class="fa-solid fa-file-pen"></i>
+              </button>
+              <span class="tooltip-text">Add Note to Selected</span>
+            </div>
+            <div class="relative group">
+              <button class="button bg-gold text-white px-4 py-2 rounded-lg disabled:opacity-50" onclick="bulkChangeToCustomer()" style="display: none;" id="change-to-customer-btn" disabled>
+                <i class="fa-solid fa-person-walking-arrow-right"></i>
+              </button>
+              <span class="tooltip-text">Change to Customer</span>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4">
         <div id="contact-list" class="bg-gray-50 p-4 rounded-lg"></div>
         <button id="new-contact-btn" class="button bg-gold text-white px-4 py-2 rounded-lg mt-2 hover:bg-yellow-600" style="display: none; background: #d0a547;" onclick="showNewContactForm()">New Contact</button>
         <div id="contact-form" class="mt-4" style="display: none;">
@@ -195,11 +222,11 @@
   <script>
     const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbl9pZCI6IllnUUp0OHppcGhlQVNtTXo2SEpmIiwidmVyc2lvbiI6MSwiaWF0IjoxNzQ4ODA3OTc5ODk1LCJzdWIiOiJ6OVNaSGxKT29KVHI4MjA5OGNLOCJ9._deFuXYQdzXwzy8T_9kzzA_CxIX_pPnaJKcgwaetKHg";
     const locationId = "YgQJt8zipheASmMz6HJf";
-    let activeCategory = 'clients';
-    let activeSubcategory = 'leads';
+    let activeCategory = 'leads';
     let selectedContactId = null;
     let allContacts = [];
-    let currentTag = ''; // Track current tag for search
+    let currentTag = '';
+    let selectedContacts = new Set();
 
     const customerCustomFields = [
       { label: 'Full Name', id: 'EXjXnQEL140VE4XYhaSX', type: 'TEXT' },
@@ -294,8 +321,7 @@
 
     function openModal() {
       document.getElementById('modal').classList.add('show');
-      setCategory('clients');
-      setSubcategory('leads');
+      setCategory('leads');
       loadContacts();
     }
 
@@ -306,13 +332,13 @@
 
     function closeForm() {
       document.getElementById('contact-form').style.display = 'none';
+      document.getElementById('contact-list').style.display = 'block';
     }
 
     function setCategory(category) {
       closeForm();
       activeCategory = category;
       allContacts = [];
-      document.getElementById('subcategory-list').classList.toggle('hidden', category !== 'clients');
       document.getElementById('new-contact-btn').style.display = 'block';
       document.querySelectorAll('.sidebar button').forEach(btn => {
         btn.classList.remove('bg-gold', 'text-white');
@@ -323,64 +349,34 @@
         activeBtn.classList.remove('bg-dark-green', 'text-white');
         activeBtn.classList.add('bg-gold', 'text-white');
       }
-      if (category === 'clients') {
-        setSubcategory(activeSubcategory || 'leads');
-      } else {
-        loadContacts();
-      }
-    }
-
-    function setSubcategory(subcategory) {
-      if (activeCategory !== 'clients') return;
-      closeForm();
-      activeSubcategory = subcategory;
-      document.getElementById('new-contact-btn').style.display = 'block';
-      document.querySelectorAll('#subcategory-list button').forEach(btn => {
-        btn.classList.remove('bg-gold', 'text-white');
-        btn.classList.add('subcategory-button');
-      });
-      const activeBtn = document.querySelector(`#subcategory-list button[onclick="setSubcategory('${subcategory}')"]`);
-      if (activeBtn) {
-        activeBtn.classList.remove('subcategory-button');
-        activeBtn.classList.add('bg-gold', 'text-white');
-      }
+      document.getElementById('change-to-customer-btn').style.display = category === 'leads' ? 'block' : 'none';
       loadContacts();
     }
 
     async function loadContacts() {
-  const tag = activeCategory === 'clients' ? (activeSubcategory === 'leads' ? 'new lead' : 'customer') : activeCategory.toLowerCase();
-  currentTag = tag; // Update current tag
-  const url = `https://rest.gohighlevel.com/v1/contacts?locationId=${locationId}&tags=${encodeURIComponent(tag)}`;
-  
-  // Show loading text
-  document.getElementById('contact-list').innerHTML = '<p class="text-gray-600 text-center py-4">Loading contacts...</p>';
-  
-  // Record start time for delay
-  const startTime = Date.now();
-  try {
-    const response = await fetch(url, { headers: { Authorization: `Bearer ${apiKey}` } });
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    const data = await response.json();
-    allContacts = data.contacts || (data.contact ? [data.contact] : []);
-    const filteredContacts = allContacts.filter(contact => contact.tags && contact.tags.includes(tag));
-    
-    // Calculate elapsed time and ensure 5-second delay
-    const elapsedTime = Date.now() - startTime;
-    const remainingTime = Math.max(0, 8000 - elapsedTime);
-    await new Promise(resolve => setTimeout(resolve, remainingTime));
-    
-    // Display contacts after delay
-    displayContacts(filteredContacts);
-  } catch (error) {
-    console.error('Error loading contacts:', error);
-    // Still respect 5-second delay on error
-    const elapsedTime = Date.now() - startTime;
-    const remainingTime = Math.max(0, 8000 - elapsedTime);
-    await new Promise(resolve => setTimeout(resolve, remainingTime));
-    
-    document.getElementById('contact-list').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contacts.</p>';
-  }
-}
+      const tag = activeCategory === 'leads' ? 'new lead' : activeCategory === 'customers' ? 'customer' : activeCategory.toLowerCase();
+      currentTag = tag;
+      const url = `https://rest.gohighlevel.com/v1/contacts?locationId=${locationId}&tags=${encodeURIComponent(tag)}`;
+      document.getElementById('contact-list').innerHTML = '<p class="text-gray-600 text-center py-4">Loading contacts...</p>';
+      const startTime = Date.now();
+      try {
+        const response = await fetch(url, { headers: { Authorization: `Bearer ${apiKey}` } });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        allContacts = data.contacts || (data.contact ? [data.contact] : []);
+        const filteredContacts = allContacts.filter(contact => contact.tags && contact.tags.includes(tag));
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, 8000 - elapsedTime);
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+        displayContacts(filteredContacts);
+      } catch (error) {
+        console.error('Error loading contacts:', error);
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, 8000 - elapsedTime);
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+        document.getElementById('contact-list').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contacts.</p>';
+      }
+    }
 
     function displayContacts(contacts) {
       const list = document.getElementById('contact-list');
@@ -388,47 +384,47 @@
       contacts.forEach(contact => {
         const firstName = contact.firstName || 'Unknown';
         const lastName = contact.lastName || '';
+        const email = contact.email || 'No email';
+        const phone = contact.phone || 'No phone';
         const contactId = contact.id;
         const li = document.createElement('li');
         li.className = 'flex justify-between items-center p-3 border-b border-gray-200 hover:bg-gray-100';
         li.innerHTML = `
-          <span class="text-dark-green">${firstName} ${lastName}</span>
-          <div class="space-x-2">
-            <div class="relative group inline-block">
-              <button class=" px-3 py-1 rounded-lg" onclick="loadContact('${contactId}')" data-tooltip="Edit">
-                <i class="fa-solid fa-pen-to-square"></i>
-              </button>
-              <span class="tooltip-text hidden group-hover:block absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">Edit</span>
+          <div class="flex items-center justify-center space-x-2">
+            <input type="checkbox" class="contact-checkbox" data-id="${contactId}">
+            <div class="flex" style="width:20vw; text-align:justify;">
+              <span class="text-dark-green font-medium">${firstName} ${lastName}</span>
             </div>
-            <div class="relative group inline-block">
-              <button class="px-3 py-1 rounded-lg" onclick="deleteContact('${contactId}')" data-tooltip="Delete">
-                <i class="fa-solid fa-trash"></i>
-              </button>
-              <span class="tooltip-text hidden group-hover:block absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">Delete</span>
+            <div class="flex" style="width:20vw; text-align:justify;">
+              <span class="text-dark-green font-medium ml-5">${email}</span>
             </div>
-            <div class="relative group inline-block">
-              <button class=" px-3 py-1 rounded-lg" onclick="addNote('${contactId}')" data-tooltip="Add Note">
-                <i class="fa-solid fa-file-pen"></i>
-              </button>
-              <span class="tooltip-text hidden group-hover:block absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">Add Note</span>
+            <div class="flex" style="width:20vw; text-align:justify;">
+              <span class="text-dark-green font-medium ml-5">${phone}</span>
             </div>
-            ${activeCategory === 'clients' && activeSubcategory === 'leads' ? `
-              <div class="relative group inline-block">
-                <button class=" px-3 py-1 rounded-lg" onclick="changeToCustomer('${contactId}')" data-tooltip="Change to Customer">
-                  <i class="fa-solid fa-person-walking-arrow-right"></i>
-                </button>
-                <span class="tooltip-text hidden group-hover:block absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">Change to Customer</span>
-              </div>
-            ` : ''}
           </div>
         `;
         list.appendChild(li);
       });
+      document.querySelectorAll('.contact-checkbox').forEach(cb => {
+        cb.addEventListener('change', toggleActionBar);
+      });
+    }
+
+    function toggleActionBar() {
+      const checkboxes = document.querySelectorAll('.contact-checkbox:checked');
+      selectedContacts.clear();
+      checkboxes.forEach(cb => selectedContacts.add(cb.dataset.id));
+      const buttons = document.querySelectorAll('#action-bar button');
+      buttons.forEach(btn => {
+        btn.disabled = selectedContacts.size === 0;
+      });
+      if (activeCategory === 'leads') {
+        document.getElementById('change-to-customer-btn').style.display = selectedContacts.size > 0 ? 'block' : 'none';
+      }
     }
 
     function searchContacts() {
       const term = document.getElementById('search-input').value.toLowerCase();
-      // Filter by both search term and current tag
       const filteredContacts = allContacts.filter(contact =>
         `${contact.firstName || ''} ${contact.lastName || ''}`.toLowerCase().includes(term) &&
         contact.tags && contact.tags.includes(currentTag)
@@ -436,8 +432,16 @@
       displayContacts(filteredContacts);
     }
 
+    async function bulkDelete() {
+      if (!confirm('Are you sure you want to delete selected contacts?')) return;
+      const deletePromises = Array.from(selectedContacts).map(id => deleteContact(id));
+      await Promise.all(deletePromises);
+      selectedContacts.clear();
+      toggleActionBar();
+      loadContacts();
+    }
+
     async function deleteContact(contactId) {
-      if (!confirm('Are you sure you want to delete this contact?')) return;
       try {
         const url = `https://rest.gohighlevel.com/v1/contacts/${contactId}?locationId=${locationId}`;
         const response = await fetch(url, {
@@ -445,17 +449,33 @@
           headers: { Authorization: `Bearer ${apiKey}` },
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        alert('Contact deleted successfully!');
-        loadContacts();
+        return true;
       } catch (error) {
         console.error('Error deleting contact:', error);
         alert('Error deleting contact. Please try again.');
+        return false;
       }
     }
 
-    async function addNote(contactId) {
-      const note = prompt('Enter your note:');
+    async function bulkLoadContacts() {
+      if (selectedContacts.size > 1) {
+        alert('Please select only one contact to view/edit.');
+        return;
+      }
+      const contactId = Array.from(selectedContacts)[0];
+      loadContact(contactId);
+    }
+
+    async function bulkAddNote() {
+      const note = prompt('Enter your note for selected contacts:');
       if (!note) return;
+      const notePromises = Array.from(selectedContacts).map(id => addNote(id, note));
+      await Promise.all(notePromises);
+      selectedContacts.clear();
+      toggleActionBar();
+    }
+
+    async function addNote(contactId, note) {
       try {
         const url = `https://rest.gohighlevel.com/v1/contacts/${contactId}/notes`;
         const response = await fetch(url, {
@@ -464,11 +484,20 @@
           body: JSON.stringify({ body: note })
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        alert('Note added successfully!');
+        return true;
       } catch (error) {
         console.error('Error adding note:', error);
         alert('Error adding note. Please try again.');
+        return false;
       }
+    }
+
+    async function bulkChangeToCustomer() {
+      const changePromises = Array.from(selectedContacts).map(id => changeToCustomer(id));
+      await Promise.all(changePromises);
+      selectedContacts.clear();
+      toggleActionBar();
+      setCategory('customers');
     }
 
     async function loadContact(contactId) {
@@ -480,6 +509,9 @@
         const data = await response.json();
         const contact = data.contact || data;
         console.log('Single Contact Response:', JSON.stringify(contact, null, 2));
+
+        document.getElementById('contact-list').style.display = 'none';
+        document.getElementById('contact-form').style.display = 'block';
 
         const standardFields = [
           { label: 'First Name', key: 'firstName', id: 'firstName', value: contact.firstName || '', required: true },
@@ -496,7 +528,7 @@
         `).join('');
 
         const customFieldsDiv = document.getElementById('custom-fields');
-        if (activeCategory === 'clients' && activeSubcategory === 'customers') {
+        if (activeCategory === 'customers') {
           const customFieldValues = contact.customField || [];
           const fieldMap = customFieldValues.reduce((map, cf) => {
             map[cf.id] = cf.value;
@@ -604,7 +636,7 @@
             }
           }).join('');
           console.log('Custom Field IDs:', customerCustomFields.map(field => field.id));
-        } else if (activeCategory !== 'clients') {
+        } else if (activeCategory !== 'leads' && activeCategory !== 'customers') {
           const nicheValue = contact.customField?.find(cf => cf.id === 'PjQ2rir2JEogi9aUAP2s')?.value || '';
           customFieldsDiv.innerHTML = `
             <div class="form-group">
@@ -642,7 +674,7 @@
       `).join('');
 
       const customFieldsDiv = document.getElementById('custom-fields');
-      if (activeCategory === 'clients' && activeSubcategory === 'customers') {
+      if (activeCategory === 'customers') {
         customFieldsDiv.innerHTML = customerCustomFields.filter(field => field.id !== 'PjQ2rir2JEogi9aUAP2s').map(field => `
           <div class="form-group">
             <label class="block font-medium mb-1">${field.label}:</label>
@@ -677,7 +709,7 @@
           </div>
         `).join('');
         console.log('Custom Field IDs for new contact:', customerCustomFields.map(field => field.id));
-      } else if (activeCategory !== 'clients') {
+      } else if (activeCategory !== 'leads' && activeCategory !== 'customers') {
         customFieldsDiv.innerHTML = `
           <div class="form-group">
             <label class="block text-dark-green font-medium mb-1">Client Niche:</label>
@@ -701,11 +733,10 @@
         lastName: document.getElementById('lastName').value,
         email: document.getElementById('email').value,
         phone: document.getElementById('phone').value,
-        tags: [activeCategory === 'clients' ? (activeSubcategory === 'leads' ? 'new lead' : 'customer') : activeCategory.toLowerCase()],
+        tags: [activeCategory === 'leads' ? 'new lead' : activeCategory === 'customers' ? 'customer' : activeCategory.toLowerCase()],
         customField: []
       };
 
-      // Handle file uploads for multiple files
       const fileUploadPromises = customerCustomFields
         .filter(field => field.type === 'FILE_UPLOAD')
         .map(async field => {
@@ -746,8 +777,7 @@
 
       await Promise.all(fileUploadPromises);
 
-      // Collect other custom fields
-      if (activeCategory === 'clients' && activeSubcategory === 'customers') {
+      if (activeCategory === 'customers') {
         const otherCustomFields = customerCustomFields.filter(field => field.type !== 'FILE_UPLOAD');
         otherCustomFields.forEach(field => {
           let value;
@@ -765,12 +795,11 @@
           }
           data.customField.push({ id: field.id, value });
         });
-      } else if (activeCategory !== 'clients') {
+      } else if (activeCategory !== 'leads' && activeCategory !== 'customers') {
         const nicheValue = document.getElementById('custom_PjQ2rir2JEogi9aUAP2s')?.value || '';
         data.customField.push({ id: 'PjQ2rir2JEogi9aUAP2s', value: nicheValue });
       }
 
-      // Filter out custom fields with empty values
       data.customField = data.customField.filter(cf => cf.value !== '' && (!Array.isArray(cf.value) || cf.value.length > 0));
 
       console.log('Request Body:', JSON.stringify(data, null, 2));
@@ -779,7 +808,6 @@
         ? `https://rest.gohighlevel.com/v1/contacts/${selectedContactId}?locationId=${locationId}`
         : `https://rest.gohighlevel.com/v1/contacts?locationId=${locationId}`;
       
-      // Ensure loader shows for at least 5 seconds
       const startTime = Date.now();
       try {
         const response = await fetch(url, {
@@ -793,7 +821,6 @@
         }
         console.log('Save Contact Response:', await response.json());
 
-        // Calculate remaining time to ensure 5 seconds total
         const elapsedTime = Date.now() - startTime;
         const remainingTime = Math.max(0, 2000 - elapsedTime);
         
@@ -804,7 +831,6 @@
         loadContacts();
       } catch (error) {
         console.error('Error saving contact:', error);
-        // Still respect 5-second delay even on error
         const elapsedTime = Date.now() - startTime;
         const remainingTime = Math.max(0, 8000 - elapsedTime);
         await new Promise(resolve => setTimeout(resolve, remainingTime));
@@ -832,12 +858,11 @@
         });
         if (!updateResponse.ok) throw new Error(`HTTP error! Status: ${updateResponse.status}`);
         console.log('Tag Update Response:', await updateResponse.json());
-        setSubcategory('customers');
-        loadContact(contactId);
-        alert('Contact changed to Customer successfully!');
+        return true;
       } catch (error) {
         console.error('Error changing to customer:', error);
         alert('Error changing contact to Customer.');
+        return false;
       }
     }
   </script>
