@@ -1,7 +1,3 @@
-8833 BDT to ABIDUR RAHMAN
-joining 18th june
-12.5 bdt is salary and 30 usd is paid
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -437,13 +433,13 @@ joining 18th june
         allContacts = data.contacts || (data.contact ? [data.contact] : []);
         const filteredContacts = allContacts.filter(contact => contact.tags && contact.tags.includes(tag));
         const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(0, 2000 - elapsedTime);
+        const remainingTime = Math.max(0, 6000 - elapsedTime);
         await new Promise(resolve => setTimeout(resolve, remainingTime));
         displayContacts(filteredContacts);
       } catch (error) {
         console.error('Error loading contacts:', error);
         const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(0, 2000 - elapsedTime);
+        const remainingTime = Math.max(0, 6000 - elapsedTime);
         await new Promise(resolve => setTimeout(resolve, remainingTime));
         document.getElementById('contact-list').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contacts.</p>';
       }
