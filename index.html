@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -387,7 +386,12 @@
 
     function openModal() {
       document.getElementById('modal').classList.add('show');
-      setCategory('leads');
+      const savedCategory = localStorage.getItem('activeCategory');
+      if (savedCategory) {
+        setCategory(savedCategory);
+      } else {
+        setCategory('leads');
+      }
       loadContacts();
     }
 
@@ -405,6 +409,7 @@
     function setCategory(category) {
       closeForm();
       activeCategory = category;
+      localStorage.setItem('activeCategory', category);
       allContacts = [];
       document.getElementById('new-contact-btn').style.display = 'block';
       document.querySelectorAll('.sidebar button').forEach(btn => {
@@ -433,13 +438,13 @@
         allContacts = data.contacts || (data.contact ? [data.contact] : []);
         const filteredContacts = allContacts.filter(contact => contact.tags && contact.tags.includes(tag));
         const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(0, 6000 - elapsedTime);
+        const remainingTime = Math.max(0, 2000 - elapsedTime);
         await new Promise(resolve => setTimeout(resolve, remainingTime));
         displayContacts(filteredContacts);
       } catch (error) {
         console.error('Error loading contacts:', error);
         const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(0, 6000 - elapsedTime);
+        const remainingTime = Math.max(0, 2000 - elapsedTime);
         await new Promise(resolve => setTimeout(resolve, remainingTime));
         document.getElementById('contact-list').innerHTML = '<p class="text-red-500 text-center py-4">Error loading contacts.</p>';
       }
@@ -881,8 +886,8 @@
       const customFieldsDiv = document.getElementById('custom-fields');
       document.getElementById('form-title').textContent = 'Create New Contact';
       document.getElementById('form-buttons').innerHTML = '';
-      const personsSection = document.getElementById('persons-section'); 
-      const customersSection = document.getElementById('customers-section'); 
+      const personsSection = document.getElementById('persons-section');
+      const customersSection = document.getElementById('customers-section');
 
 
       if (activeCategory === 'customers') {
@@ -894,7 +899,7 @@
         addPersonBtn.textContent = '+ Add Person';
         addPersonBtn.onclick = addPerson;
         document.getElementById('form-buttons').appendChild(addPersonBtn);
-        
+
 
         customFieldsDiv.innerHTML = customerCustomFields.filter(field => field.id !== 'PjQ2rir2JEogi9aUAP2s' && field.id !== driversLicenseFieldId && field.id !== citizenshipCertFieldId).map(field => `
           <div class="form-group">
