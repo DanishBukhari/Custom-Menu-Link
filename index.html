@@ -192,6 +192,8 @@
               onclick="setCategory('tradies')">Tradies</button></li>
           <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg"
               onclick="setCategory('finance')">Finance</button></li>
+          <li><button class="bg-dark-green text-white px-4 py-2 rounded-lg"
+              onclick="setCategory('Buyers Agent')">Buyers Agent</button></li>
         </ul>
       </div>
       <div class="main-content">
@@ -302,12 +304,12 @@
       { label: 'Upload DL/Passport', id: 'HOhKJUkCUTScTWamVlZf', type: 'FILE_UPLOAD' },
       { label: 'Alternate email', id: 'KZXiIduGXfQa4gcpSAHv', type: 'TEXT' },
       { label: 'Preferred Method of Communication', id: 'grhYMh52GpDD8QuNuo0J', type: 'MULTIPLE_OPTIONS', options: ['Email', 'Phone', 'Text', 'In-Person'] },
-      { label: 'Type of Service', id: 'sHX29V5gxwBYO4WMTQHp', type: 'RADIO', options: ['Full Service Buyers Advocacy', 'Auction Bidding', 'Negotiation Only'] },
+      { label: 'Type of Service', id: 'sHX29V5gxwBYO4WMTQHp', type: 'RADIO', options: ['Full Service Buyers Advocacy', 'Vendor Advocacy', 'Auction Bidding', 'Negotiation Only'] },
       { label: 'Form 6 Sent?', id: 'PR7PRh4wuvF9yrMLhaZF', type: 'RADIO', options: ['Yes', 'No'] },
-      { label: 'Form 6 Executed', id: 'KQz5NQgoGq1l6sI8YPk6', type: 'CHECKBOX', options: ['Yes, Signed by all parties'] },
+      { label: 'Form 6 Executed', id: 'KQz5NQgoGq1l6sI8YPk6', type: 'CHECKBOX', options: ['Yes'] },
       { label: 'Form 6 Sent to all parties', id: 'APFoTEdW0JHfH5uJIqUL', type: 'RADIO', options: ['Yes', 'No'] },
       { label: 'Client Agreement Sent?', id: 'iPFysM90lheoQzV0FOBM', type: 'RADIO', options: ['Yes', 'No'] },
-      { label: 'Client Agreement Executed', id: '4sFw9DsvvygEWyyl2wOx', type: 'CHECKBOX', options: ['Yes, Agreement Signed'] },
+      { label: 'Client Agreement Executed', id: '4sFw9DsvvygEWyyl2wOx', type: 'CHECKBOX', options: ['Yes'] },
       { label: 'Client Agreement sent to all Parties', id: 'CL0w2AcSvCkjyo4L15ip', type: 'RADIO', options: ['Yes', 'No'] },
       { label: 'Service Fee', id: 'FLP394K9sPjDT21C0Yda', type: 'TEXT' },
       { label: 'Fee to be Paid', id: 'E6fHsabXPU5QkUd3f6wI', type: 'SINGLE_OPTIONS', options: ['Unconditional', 'Conditional', 'Not Applicable'] },
@@ -359,7 +361,7 @@
       { label: 'Heritage', id: 'JNxCzxrxifroeclObyRB', type: 'FILE_UPLOAD', multiple: true },
       { label: 'Title Search', id: 'wapXPv1hnCYDpDK1vfTa', type: 'LARGE_TEXT' },
       { label: 'Mortgage Broker Check Complete', id: 'zVVmbafhz3TZ1xfOK9yj', type: 'RADIO', options: ['Yes', 'No'] },
-      { label: 'Contract Sent to Solicitor', id: 'txxrIggN291g9OISLz3y', type: 'LARGE_TEXT' },
+      { label: 'Contract Sent to Solicitor', id: 'txxrIggN291g9OISLz3y', type: 'RADIO', options: ['Yes', 'No'] },
       { label: 'Offer received by real estate agent', id: 'm9i7HQXWY17PfBBFoOwc', type: 'RADIO', options: ['Yes', 'No'] },
       { label: 'Full Name (Client 2)', id: 'wHB4bJhT9kuFPNAHMygP', type: 'TEXT' },
       { label: 'Address (Client 2)', id: '634PeulkBMxDwi5Mw9tf', type: 'LARGE_TEXT' },
@@ -685,7 +687,7 @@
           if (components && !addressValue) addressValue = components;
           else if (components) addressValue = [addressValue, components].filter(v => v).join(', ').trim();
 
-          customFieldsDiv.innerHTML = customerCustomFields.filter(field => field.id !== 'PjQ2rir2JEogi9aUAP2s' && field.id !== driversLicenseFieldId && field.id !== citizenshipCertFieldId).map(field => {
+          customFieldsDiv.innerHTML = customerCustomFields.filter(field => field.id !== 'PjQ2rir2JEogi9aUAP2s' || '38zzyZUFqfgWsJIXnZaX' && field.id !== driversLicenseFieldId && field.id !== citizenshipCertFieldId).map(field => {
             let fieldValue = fieldMap[field.id] || '';
             if (field.label === 'Full Name') fieldValue = `${contact.firstName || ''} ${contact.lastName || ''}`.trim();
             if (field.label === 'Address') fieldValue = addressValue;
@@ -783,6 +785,14 @@
             </div>
           `;
           console.log('Custom Field IDs:', ['PjQ2rir2JEogi9aUAP2s']);
+          const saValue = contact.customField?.find(cf => cf.id === '38zzyZUFqfgWsJIXnZaX')?.value || '';
+          customFieldsDiv.innerHTML = `
+            <div class="form-group">
+              <label class="block text-dark-green font-medium mb-1">Service Areas:</label>
+              <input type="text" id="custom_38zzyZUFqfgWsJIXnZaX" value="${saValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
+            </div>
+          `;
+          console.log('Custom Field IDs:', ['38zzyZUFqfgWsJIXnZaX']);
         } else {
           customFieldsDiv.innerHTML = '';
         }
@@ -896,7 +906,7 @@
         document.getElementById('form-buttons').appendChild(addPersonBtn);
         
 
-        customFieldsDiv.innerHTML = customerCustomFields.filter(field => field.id !== 'PjQ2rir2JEogi9aUAP2s' && field.id !== driversLicenseFieldId && field.id !== citizenshipCertFieldId).map(field => `
+        customFieldsDiv.innerHTML = customerCustomFields.filter(field => field.id !== 'PjQ2rir2JEogi9aUAP2s' || '38zzyZUFqfgWsJIXnZaX' && field.id !== driversLicenseFieldId && field.id !== citizenshipCertFieldId).map(field => `
           <div class="form-group">
             <label class="block font-medium mb-1">${field.label}:</label>
             ${field.type === 'FILE_UPLOAD' ?
@@ -936,6 +946,8 @@
           <div class="form-group">
             <label class="block text-dark-green font-medium mb-1">Client Niche:</label>
             <input type="text" id="custom_PjQ2rir2JEogi9aUAP2s" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
+            <label class="block text-dark-green font-medium mb-1">Service Areas:</label>
+            <input type="text" id="custom_38zzyZUFqfgWsJIXnZaX" class="w-full p-2 border border-gray-300 rounded-lg focus:border-gold">
           </div>
         `;
         console.log('Custom Field IDs for new contact:', ['PjQ2rir2JEogi9aUAP2s']);
@@ -1076,7 +1088,9 @@
       }
       else if (activeCategory !== 'leads') {
         const nicheValue = document.getElementById('custom_PjQ2rir2JEogi9aUAP2s')?.value || '';
+        const saValue = document.getElementById('custom_38zzyZUFqfgWsJIXnZaX')?.value || '';
         if (nicheValue) data.customField.push({ id: 'PjQ2rir2JEogi9aUAP2s', value: nicheValue });
+        if (saValue) data.customField.push({ id: '38zzyZUFqfgWsJIXnZaX', value: saValue });
       }
 
       // 5. Clean and submit
