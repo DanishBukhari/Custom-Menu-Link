@@ -873,10 +873,26 @@
         // ]
       };
       function openModal() {
-        document.getElementById("modal").classList.add("show");
-        setCategory("leads");
-        loadContacts();
-      }
+  document.getElementById("modal").classList.add("show");
+  
+  // Check localStorage for saved category, default to 'leads'
+  const savedCategory = localStorage.getItem('activeCategory') || 'leads';
+  activeCategory = savedCategory;
+  
+  // Set the active button styling
+  document.querySelectorAll(".sidebar button").forEach((btn) => {
+    btn.classList.remove("bg-gold", "text-white");
+    btn.classList.add("bg-dark-green", "text-white");
+  });
+  const activeBtn = document.querySelector(`.sidebar button[onclick="setCategory('${activeCategory}')"]`);
+  if (activeBtn) {
+    activeBtn.classList.remove("bg-dark-green", "text-white");
+    activeBtn.classList.add("bg-gold", "text-white");
+  }
+  
+  document.getElementById("change-to-client-btn").style.display = activeCategory === "leads" ? "block" : "none";
+  loadContacts();
+}
       function closeModal() {
         document.getElementById("modal").classList.remove("show");
         closeForm();
@@ -887,6 +903,7 @@
         document.getElementById("new-contact-btn").style.display = "block";
       }
       function setCategory(category) {
+        localStorage.setItem('activeCategory', category);
         closeForm();
         activeCategory = category;
         allContacts = [];
